@@ -18,6 +18,8 @@ struct MenuPanel: View {
     @State private var evidenceExpanded = false
     @State private var limitationsExpanded = false
     @State private var webURLs: [String: URL] = [:]
+    /// Kept across refreshes: a port's role is probed once per process, not every minute.
+    @State private var portRoles: [String: PortRole] = [:]
     @State private var portlessURLs: [String: [URL]] = [:]
     @State private var portlessError: String?
     @AppStorage("leftopen.portlessStateDirectory") private var portlessDirectory = "~/.portless"
@@ -84,6 +86,22 @@ struct MenuPanel: View {
                 }
             }
         }
+        let current = Dictionary(activities.map { (roleKey($0), $0) }, uniquingKeysWith: { first, _ in first })
+        portRoles = portRoles.filter { current[$0.key] != nil }
+        let unprobed = current.filter { portRoles[$0.key] == nil }.map(\.value)
+        // Roles found before a cancellation are still valid, so keep them.
+        let found = await PortRoleProbe.detect(unprobed)
+        for activity in unprobed {
+            if let role = found[activity.id] { portRoles[roleKey(activity)] = role }
+        }
+    }
+
+    private func roleKey(_ activity: Activity) -> String {
+        "\(activity.id):\(activity.process.executablePath ?? activity.process.command)"
+    }
+
+    private func role(for activity: Activity) -> PortRole? {
+        portRoles[roleKey(activity)]
     }
 
     private var filteredActivities: [Activity] {
@@ -96,6 +114,7 @@ struct MenuPanel: View {
                 activity.inference.label, activity.process.command,
                 activity.process.user ?? "", activity.process.cwd ?? "",
                 activity.listener.addresses.joined(separator: " "),
+                role(for: activity)?.label ?? "",
             ]
             return fields.contains { $0.lowercased().contains(search) }
         }
@@ -756,12 +775,15 @@ struct MenuPanel: View {
     private func listenerRow(_ activity: Activity) -> some View {
         let closeTarget = CloseService.protectionReason(for: activity,
             safetyProtectionEnabled: settings.safetyProtectionEnabled) == nil ? activity : nil
+        let addresses = activity.listener.addresses.joined(separator: ", ")
+        let scope = activity.scope == .lan ? L("LAN-facing", "局域网可见") : L("Local only", "仅本机")
+        let role = role(for: activity)
         return PortRow(
             port: activity.listener.port,
             icon: nil,
-            title: activity.listener.addresses.joined(separator: ", "),
+            title: role?.label ?? addresses,
             subtitle: fixed.binding(for: activity).map { "\($0.name).localhost" }
-                ?? (activity.scope == .lan ? L("LAN-facing", "局域网可见") : L("Local only", "仅本机")),
+                ?? (role == nil ? scope : "\(addresses) · \(scope)"),
             fixedName: fixed.binding(for: activity)?.name,
             isLAN: activity.scope == .lan,
             closeFailed: model.awaitsForceClose(activity),
@@ -898,6 +920,15 @@ struct MenuPanel: View {
                     infoRow(L("Executable", "可执行文件"), compactPath(activity.process.executablePath))
                     infoRow(L("Folder", "目录"), compactPath(activity.process.cwd))
                     infoRow(L("Addresses", "地址"), activity.listener.addresses.joined(separator: ", "))
+                    if let role = role(for: activity) {
+                        infoRow(L("Role", "用途"), role.label)
+                            .help(role.reason)
+                        Text(role.reason)
+                            .font(AppAppearance.secondary)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.leading, 92)
+                    }
                     if let webURL {
                         infoRow(L("Web URL", "网址"), webURL.absoluteString)
                     }

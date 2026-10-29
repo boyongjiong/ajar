@@ -23,6 +23,19 @@ func scopeLabel(_ scope: ListenerScope) -> String {
     scope == .local ? green("LOCAL") : yellow("LAN")
 }
 
+/// The CLI is synchronous; role probes are bounded, so waiting on them here is brief.
+func portRoles(_ activities: [Activity]) -> [String: PortRole] {
+    final class Box: @unchecked Sendable { var roles: [String: PortRole] = [:] }
+    let box = Box()
+    let done = DispatchSemaphore(value: 0)
+    Task.detached {
+        box.roles = await PortRoleProbe.detect(activities)
+        done.signal()
+    }
+    done.wait()
+    return box.roles
+}
+
 func printSection(_ title: String, hint: String? = nil, activities: [Activity]) {
     guard !activities.isEmpty else { return }
     print("\n\(bold(title)) \(dim("(\(activities.count))"))")
@@ -66,6 +79,7 @@ func printDetail(port: Int, activities: [Activity]) {
         return
     }
     print("\n\(bold("PORT \(port)")) · \(matches.count) listener\(matches.count == 1 ? "" : "s")")
+    let roles = portRoles(matches)
     for (idx, activity) in matches.enumerated() {
         if idx > 0 { print(dim(String(repeating: "─", count: 56))) }
         print("URL:        http://localhost:\(activity.listener.port)")
@@ -85,6 +99,9 @@ func printDetail(port: Int, activities: [Activity]) {
         print("User:       \(activity.process.user ?? activity.process.uid.map(String.init) ?? "unknown")")
         print("Scope:      \(scopeLabel(activity.scope))")
         print("Addresses:  \(activity.listener.addresses.joined(separator: ", "))")
+        if let role = roles[activity.id] {
+            print("Role:       \(role.label) \(dim("— \(role.reason)"))")
+        }
         print("Executable: \(compactPath(activity.process.executablePath))")
         print("CWD:        \(compactPath(activity.process.cwd))")
         if let marker = activity.projectMarker {
@@ -197,6 +214,8 @@ func runOpen(port: Int, activities: [Activity]) {
 
 func printJSON(snapshot: ScanSnapshot) {
     let addresses = FixedAddressCatalog.read()?.verified(in: snapshot.activities) ?? []
+    // Opt-in: probing every port costs seconds that scripts calling --json should not pay.
+    let roles = CommandLine.arguments.contains("--roles") ? portRoles(snapshot.activities) : [:]
     var list: [[String: Any]] = []
     for a in snapshot.activities {
         var item: [String: Any] = [
@@ -222,6 +241,9 @@ func printJSON(snapshot: ScanSnapshot) {
         ]
         if let address = addresses.first(where: { $0.pid == a.process.pid && $0.port == a.listener.port }) {
             item["fixedURL"] = address.url.absoluteString
+        }
+        if let role = roles[a.id] {
+            item["role"] = ["kind": role.kind.rawValue, "label": role.label, "reason": role.reason]
         }
         if let m = a.projectMarker {
             item["project"] = ["name": m.name, "root": m.root, "source": m.source]
@@ -300,6 +322,7 @@ Usage:
   leftopen close --all-projects Gracefully close all dev project servers
   leftopen url [name|port|path]  Get verified project addresses (also supports --json)
   leftopen --json               Print machine-readable output
+  leftopen --json --roles       Also probe what each port is for (slower)
 
 Options:
   --projects             Show dev project ports only
