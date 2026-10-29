@@ -436,13 +436,13 @@ struct LeftOpenApp: App {
                 if model.notice?.kind == .error {
                     Image(systemName: "exclamationmark.triangle")
                 } else {
-                    Image(nsImage: model.hasOpenDoors ? MenuBarDoor.open : MenuBarDoor.closed)
+                    Image(nsImage: MenuBarDoor.image(isOpen: model.hasOpenDoors, badged: badgeCount != nil))
                         .overlay(alignment: .topTrailing) {
                             if model.hasFailedClose {
                                 Circle()
                                     .fill(Color(nsColor: .systemRed))
                                     .frame(width: 6, height: 6)
-                                    .offset(x: 2, y: -2)
+                                    .offset(x: 2 - MenuBarDoor.trailingInset(badged: badgeCount != nil), y: -2)
                                     .accessibilityHidden(true)
                             }
                         }

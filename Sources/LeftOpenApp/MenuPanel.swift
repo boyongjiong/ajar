@@ -1886,24 +1886,29 @@ struct DoorMark: View {
                 // At menu bar size the hairline frame vanishes; thicken it to SF Symbol weight,
                 // keeping the outer edge where the full-size frame's is.
                 if isTemplate {
-                    let inset = 2.0
+                    // 1.4 pt matches the regular-weight SF Symbols beside it in the menu bar.
+                    let lineWidth = 1.4 / sx
+                    let half = lineWidth / 2
+                    let left = 0.391 + half, right = 32.375 - half
+                    let top = 0.248 + half, bottom = 54.805 - half
+                    let pull = 0.55 * half
                     Path { p in
-                        p.move(to: CGPoint(x: inset * sx, y: (54.805 - inset + 0.39) * sy))
-                        p.addLine(to: CGPoint(x: inset * sx, y: 16.155 * sy))
+                        p.move(to: CGPoint(x: left * sx, y: bottom * sy))
+                        p.addLine(to: CGPoint(x: left * sx, y: 16.155 * sy))
                         p.addCurve(
-                            to: CGPoint(x: 16.383 * sx, y: (0.248 + inset - 0.39) * sy),
-                            control1: CGPoint(x: inset * sx, y: 8.3 * sy),
-                            control2: CGPoint(x: 8.5 * sx, y: (0.248 + inset - 0.39) * sy)
+                            to: CGPoint(x: 16.383 * sx, y: top * sy),
+                            control1: CGPoint(x: left * sx, y: (7.43 + pull) * sy),
+                            control2: CGPoint(x: (7.609 + pull) * sx, y: top * sy)
                         )
                         p.addCurve(
-                            to: CGPoint(x: (32.766 - inset) * sx, y: 16.155 * sy),
-                            control1: CGPoint(x: 24.3 * sx, y: (0.248 + inset - 0.39) * sy),
-                            control2: CGPoint(x: (32.766 - inset) * sx, y: 8.3 * sy)
+                            to: CGPoint(x: right * sx, y: 16.155 * sy),
+                            control1: CGPoint(x: (25.157 - pull) * sx, y: top * sy),
+                            control2: CGPoint(x: right * sx, y: (7.43 + pull) * sy)
                         )
-                        p.addLine(to: CGPoint(x: (32.766 - inset) * sx, y: (54.805 - inset + 0.39) * sy))
+                        p.addLine(to: CGPoint(x: right * sx, y: bottom * sy))
                         p.closeSubpath()
                     }
-                    .stroke(darkColor, lineWidth: 3.2 * sx)
+                    .stroke(darkColor, lineWidth: lineWidth * sx)
                 }
             }
             .compositingGroup()
@@ -1914,13 +1919,36 @@ struct DoorMark: View {
 }
 
 /// The door rendered once per state as a template image, sized like an SF Symbol in the menu bar.
+/// The door is narrower than most symbols, so it sits centred on a 16 pt canvas (like
+/// `magnifyingglass`) to take the same width; next to a badge the trailing space is dropped.
 @MainActor
 enum MenuBarDoor {
-    static let open = render(isOpen: true)
-    static let closed = render(isOpen: false)
+    private static let open = render(isOpen: true, badged: false)
+    private static let closed = render(isOpen: false, badged: false)
+    private static let openBadged = render(isOpen: true, badged: true)
+    private static let closedBadged = render(isOpen: false, badged: true)
 
-    private static func render(isOpen: Bool) -> NSImage {
-        let renderer = ImageRenderer(content: DoorMark(isOpen: isOpen, isTemplate: true).frame(width: 10, height: 16.7))
+    static func image(isOpen: Bool, badged: Bool) -> NSImage {
+        switch (isOpen, badged) {
+        case (true, false): open
+        case (false, false): closed
+        case (true, true): openBadged
+        case (false, true): closedBadged
+        }
+    }
+
+    private static let glyph = CGSize(width: 9.6, height: 16)
+    private static let side = (16 - glyph.width) / 2
+
+    /// Space between the door's right edge and the image's, for marks pinned to the door.
+    static func trailingInset(badged: Bool) -> CGFloat { badged ? 0 : side }
+
+    private static func render(isOpen: Bool, badged: Bool) -> NSImage {
+        let content = DoorMark(isOpen: isOpen, isTemplate: true)
+            .frame(width: glyph.width, height: glyph.height)
+            .padding(.leading, side)
+            .padding(.trailing, trailingInset(badged: badged))
+        let renderer = ImageRenderer(content: content)
         renderer.scale = 2
         let image = renderer.nsImage ?? NSImage()
         image.isTemplate = true
