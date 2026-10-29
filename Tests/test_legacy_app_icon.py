@@ -12,7 +12,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 class LegacyIconTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.workspace = tempfile.TemporaryDirectory(prefix="leftopen-icon-tests-")
+        cls.workspace = tempfile.TemporaryDirectory(prefix="ajar-icon-tests-")
         cls.directory = pathlib.Path(cls.workspace.name)
         cls.tool = cls.directory / "icon-tool"
         subprocess.run(["swiftc", str(ROOT / "Scripts/legacy-app-icon.swift"), "-o", str(cls.tool)], check=True)

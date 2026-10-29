@@ -6,8 +6,8 @@ import { spawnSync } from 'node:child_process';
 import { noLinks, repairUserDirectories, installAddressService } from './setup-policy.mjs';
 import { ownedService, assertOwnedHTTPSListener, stopOwnedService } from './service-identity.mjs';
 import { proxyPort, selectProxyPort } from './proxy-config.mjs';
-const label = 'app.leftopen.portless.proxy';
-const protectedRoot = '/Library/Application Support/LeftOpen/Portless';
+const label = 'io.github.boyongjiong.ajar.portless.proxy';
+const protectedRoot = '/Library/Application Support/Ajar/Portless';
 const plist = `/Library/LaunchDaemons/${label}.plist`;
 function fail(code) { process.stderr.write(code + '\n'); process.exit(1); }
 if (process.getuid() !== 0) fail('authorizationRequired');
@@ -19,10 +19,10 @@ if (!source || !home || !/^[a-zA-Z0-9_.-]+$/.test(user) || !/^[0-9]+$/.test(uidT
 const uid = Number(uidText), gid = Number(gidText);
 const identity = spawnSync('/usr/bin/id', ['-u', user], { encoding: 'utf8' });
 if (identity.status !== 0 || Number(identity.stdout.trim()) !== uid || !Number.isInteger(gid)) fail('invalidOwner');
-const directory = path.join(home, 'Library/Application Support/LeftOpen/Portless');
+const directory = path.join(home, 'Library/Application Support/Ajar/Portless');
 // Reject links before elevated file operations, including preexisting certificate/state files.
 for (const file of [home, path.join(home, 'Library'), path.join(home, 'Library/Application Support'),
-  path.join(home, 'Library/Application Support/LeftOpen'), '/Library/Application Support/LeftOpen', plist]) {
+  path.join(home, 'Library/Application Support/Ajar'), '/Library/Application Support/Ajar', plist]) {
   try { if (fs.lstatSync(file).isSymbolicLink()) fail('unsafePath'); }
   catch (error) { if (error.code !== 'ENOENT') fail('unsafePath'); }
 }
@@ -80,7 +80,7 @@ try {
 } catch (error) { fail(error.message); }
 fs.mkdirSync(protectedRoot, { recursive: true, mode: 0o755 });
 // Copy only the verified package and helpers, never a project script or shell profile.
-for (const name of ['package', nodeName, 'lease-gate.mjs', 'PORTLESS-LICENSE', `NODE-LICENSE-${process.arch === 'arm64' ? 'arm64' : 'x64'}`, 'LEFTOPEN-NOTICE']) {
+for (const name of ['package', nodeName, 'lease-gate.mjs', 'PORTLESS-LICENSE', `NODE-LICENSE-${process.arch === 'arm64' ? 'arm64' : 'x64'}`, 'AJAR-NOTICE']) {
   const destination = path.join(protectedRoot, name);
   if (fs.existsSync(destination)) fs.rmSync(destination, { recursive: true });
   fs.cpSync(path.join(source, name), destination, { recursive: true, dereference: false });

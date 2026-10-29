@@ -1,4 +1,4 @@
-// LeftOpen owns routes and lifetime; Portless owns HTTP/WebSocket forwarding.
+// Ajar owns routes and lifetime; Portless owns HTTP/WebSocket forwarding.
 import { createProxyServer } from './package/dist/index.js';
 function validHost(name) {
   return typeof name === 'string' && name.length <= 253 && name.endsWith('.localhost')

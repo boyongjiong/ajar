@@ -18,22 +18,22 @@ class PrepareReleaseTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.plist = self.root / "Resources/Info.plist"
-        self.cli = self.root / "Sources/LeftOpenCLI/main.swift"
+        self.cli = self.root / "Sources/AjarCLI/main.swift"
         self.plist.parent.mkdir(parents=True)
         self.cli.parent.mkdir(parents=True)
         self.plist.write_bytes(plistlib.dumps({
             "CFBundleVersion": "13", "CFBundleShortVersionString": "0.4.0",
-            "CFBundleIdentifier": "app.leftopen.mac",
+            "CFBundleIdentifier": "io.github.boyongjiong.ajar.mac",
         }))
-        self.cli.write_text('print("LeftOpen 0.4.0")\n')
+        self.cli.write_text('print("Ajar 0.4.0")\n')
 
     def test_both_versions_and_identity(self):
         release.prepare(self.root, "0.10.0", 1001, "v0.9.0")
         data = plistlib.loads(self.plist.read_bytes())
         self.assertEqual(data["CFBundleShortVersionString"], "0.10.0")
         self.assertEqual(data["CFBundleVersion"], "1001")
-        self.assertEqual(data["CFBundleIdentifier"], "app.leftopen.mac")
-        self.assertEqual(self.cli.read_text(), 'print("LeftOpen 0.10.0")\n')
+        self.assertEqual(data["CFBundleIdentifier"], "io.github.boyongjiong.ajar.mac")
+        self.assertEqual(self.cli.read_text(), 'print("Ajar 0.10.0")\n')
 
     def test_rejects_invalid_or_older_versions_without_writes(self):
         before = self.plist.read_bytes(), self.cli.read_bytes()

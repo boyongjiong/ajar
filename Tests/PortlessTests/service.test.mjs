@@ -15,7 +15,7 @@ const runtime = path.resolve('.build/portless-runtime');
 const cli = path.join(runtime, 'package/dist/cli.js');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 function directory(t) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'leftopen-service-test-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ajar-service-test-'));
   t.after(() => fs.rmSync(dir, { force: true, recursive: true }));
   return dir;
 }
@@ -33,8 +33,8 @@ test('observation leases expire and fail closed, while live upstream sessions re
   const dir = directory(t);
   const routes = [{hostname:'observed.localhost',port:3000,pid:42}, {hostname:'started.localhost',port:4000,pid:43}];
   assert.deepEqual(gateRoutes(routes, dir, 100, () => true), []);
-  atomicJSON(path.join(dir, 'leftopen-managed.json'), ['observed.localhost']);
-  atomicJSON(path.join(dir, 'leftopen-leases.json'), {expiresAt:200,routes:[{...routes[0],ownerPid:42,pid:44}]});
+  atomicJSON(path.join(dir, 'ajar-managed.json'), ['observed.localhost']);
+  atomicJSON(path.join(dir, 'ajar-leases.json'), {expiresAt:200,routes:[{...routes[0],ownerPid:42,pid:44}]});
   assert.equal(gateRoutes(routes, dir, 100, () => true).length, 2);
   assert.deepEqual(gateRoutes(routes, dir, 201, () => true), [routes[1]]);
   assert.deepEqual(gateRoutes(routes, dir, 100, pid => pid !== 44), [routes[1]]);
@@ -62,7 +62,7 @@ test('route updates preserve wrapper ownership and refuse collisions without sig
   assert.equal(store.loadRoutes().find(r => r.hostname === 'app.localhost'), undefined);
   assert.ok(store.loadRoutes().find(r => r.hostname === 'other.localhost'));
   assert.equal(owner.exitCode, null, 'pausing routes must not stop the project');
-  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, 'leftopen-leases.json'))).routes, []);
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, 'ajar-leases.json'))).routes, []);
   syncRoutes(dir, [{hostname:'app.localhost',port:3000,pid:process.pid}]);
   assert.ok(gateRoutes(store.loadRoutes(), dir).find(r => r.hostname === 'app.localhost'));
   assert.ok(store.loadRoutes().find(r => r.hostname === 'other.localhost'));
@@ -73,7 +73,7 @@ test('project inspection uses upstream config and worktree naming without execut
   json(path.join(dir, 'package.json'), {name:'example',scripts:{dev:'node server.mjs'}});
   json(path.join(dir, 'portless.json'), {name:'configured-app',script:'dev'});
   const info = cwd => {
-    const result = spawnSync(process.execPath, [cli,'--leftopen-project-info'], {cwd, encoding:'utf8',env:{PATH:'/usr/bin:/bin',HOME:os.homedir()}});
+    const result = spawnSync(process.execPath, [cli,'--ajar-project-info'], {cwd, encoding:'utf8',env:{PATH:'/usr/bin:/bin',HOME:os.homedir()}});
     assert.equal(result.status,0,result.stderr);
     return JSON.parse(result.stdout);
   };
@@ -116,7 +116,7 @@ test('real pinned HTTPS proxy validates certificates, serves HTTP/2, and expires
   const req=session.request({':path':'/',':authority':`secure.localhost:${port}`});
   let body='';req.on('data',chunk=>body+=chunk);await once(req,'end'); session.close();
   assert.equal(body,'secure-backend');
-  atomicJSON(path.join(dir,'leftopen-leases.json'),{expiresAt:0,routes:[]});
+  atomicJSON(path.join(dir,'ajar-leases.json'),{expiresAt:0,routes:[]});
   assert.equal((await get()).status,404);
 });
 
@@ -139,7 +139,7 @@ test('upstream saved-project launch allocates ports and discovers workspace serv
   const proxy=spawn(process.execPath,[cli,'proxy','start','--no-tls','--skip-trust','--foreground','--port',String(port)],{env,stdio:'ignore'});
   t.after(async()=>{if(proxy.exitCode===null){const exited=once(proxy,'exit');proxy.kill();await exited;}});
   await eventually(()=>fs.existsSync(path.join(state,'proxy.pid')));
-  const inspected=spawnSync(process.execPath,[cli,'--leftopen-project-info'],{cwd:project,env,encoding:'utf8'});
+  const inspected=spawnSync(process.execPath,[cli,'--ajar-project-info'],{cwd:project,env,encoding:'utf8'});
   const info=JSON.parse(inspected.stdout);assert.equal(info.workspace,true);assert.equal(info.canStart,true);
   const job=spawn(process.execPath,[cli,'--script','dev'],{cwd:project,env,stdio:'ignore'});
   t.after(async()=>{if(job.exitCode===null){const exited=once(job,'exit');job.kill();await exited;}});

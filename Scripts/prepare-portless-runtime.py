@@ -70,19 +70,19 @@ def prepare():
     cli_path = package_dir / 'dist/cli.js'
     cli = cli_path.read_text()
     changes = {
-        'var SERVICE_LABEL = "sh.portless.proxy";': 'var SERVICE_LABEL = "app.leftopen.portless.proxy";',
+        'var SERVICE_LABEL = "sh.portless.proxy";': 'var SERVICE_LABEL = "io.github.boyongjiong.ajar.portless.proxy";',
         'getRoutes: () => cachedRoutes,': 'getRoutes: () => gateRoutes(cachedRoutes, store.dir),',
     }
     for before, after in changes.items():
         if cli.count(before) != 1:
             raise ValueError('Pinned Portless CLI layout changed; review the adapter')
         cli = cli.replace(before, after)
-    cli = cli.replace('#!/usr/bin/env node\n', '#!/usr/bin/env node\n// Modified by LeftOpen; see ../../LEFTOPEN-NOTICE.\nimport { gateRoutes } from "../../lease-gate.mjs";\n', 1)
+    cli = cli.replace('#!/usr/bin/env node\n', '#!/usr/bin/env node\n// Modified by Ajar; see ../../AJAR-NOTICE.\nimport { gateRoutes } from "../../lease-gate.mjs";\n', 1)
     needle = '  const args = process.argv.slice(2);'
     if cli.count(needle) != 1:
         raise ValueError('Pinned CLI argument entry changed')
     cli = cli.replace(needle, needle + '\n' + '''
-  if (args[0] === "--leftopen-project-info") {
+  if (args[0] === "--ajar-project-info") {
     const config = loadAppConfig();
     const baseName = config?.name || inferProjectName().name;
     const worktree = detectWorktreePrefix();
@@ -103,7 +103,7 @@ def prepare():
     for module in (package_dir / 'dist').glob('*.js'):
         value = module.read_text()
         if '"# portless-start"' in value:
-            value = '// Hosts markers modified by LeftOpen; see ../../LEFTOPEN-NOTICE.\n' + value.replace('"# portless-start"', '"# leftopen-portless-start"').replace('"# portless-end"', '"# leftopen-portless-end"')
+            value = '// Hosts markers modified by Ajar; see ../../AJAR-NOTICE.\n' + value.replace('"# portless-start"', '"# ajar-portless-start"').replace('"# portless-end"', '"# ajar-portless-end"')
             module.write_text(value)
             modified_hosts += 1
     if modified_hosts != 1:

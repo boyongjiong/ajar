@@ -11,7 +11,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTER = '/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister'
-MARKER = '.leftopen-local-build'
+MARKER = '.ajar-local-build'
 
 
 def describe_version(repo):
@@ -38,7 +38,7 @@ class LocalBuild:
         self.repo = repo
         self.parent = repo / '.build'
         self.directory = self.parent / 'local-app.noindex'
-        self.app = self.directory / 'LeftOpen.app'
+        self.app = self.directory / 'Ajar.app'
 
     def check_paths(self):
         for path in (self.parent, self.directory, self.app):
@@ -46,7 +46,7 @@ class LocalBuild:
                 raise RuntimeError(f'Refusing a symlink at {path}')
         if self.directory.exists():
             marker = self.directory / MARKER
-            if marker.is_symlink() or not marker.is_file() or marker.read_text() != 'leftopen-local-build-v1\n':
+            if marker.is_symlink() or not marker.is_file() or marker.read_text() != 'ajar-local-build-v1\n':
                 raise RuntimeError(f'Unrecognized build directory; left untouched: {self.directory}')
 
     def active(self):
@@ -74,11 +74,11 @@ class LocalBuild:
         version = describe_version(self.repo)
         self.clean()
         self.directory.mkdir(parents=True)
-        (self.directory / MARKER).write_text('leftopen-local-build-v1\n')
-        env = dict(os.environ, LEFTOPEN_OUTPUT_DIR=str(self.directory),
-                   LEFTOPEN_BUNDLE_ID='app.leftopen.local-test', LEFTOPEN_APP_DISPLAY_NAME='LeftOpen Test')
+        (self.directory / MARKER).write_text('ajar-local-build-v1\n')
+        env = dict(os.environ, AJAR_OUTPUT_DIR=str(self.directory),
+                   AJAR_BUNDLE_ID='io.github.boyongjiong.ajar.local-test', AJAR_APP_DISPLAY_NAME='Ajar Test')
         if version:
-            env['LEFTOPEN_VERSION'] = version
+            env['AJAR_VERSION'] = version
         try:
             subprocess.run(['/bin/zsh', str(self.repo / 'Scripts/build-app.sh')], cwd=self.repo, env=env, check=True)
             self.unregister()
@@ -92,7 +92,7 @@ class LocalBuild:
         # Run the exact binary, not `open`: do not ask Launch Services to register another app.
         child = None
         try:
-            child = subprocess.Popen([str(self.app / 'Contents/MacOS/LeftOpenApp')], cwd=self.repo)
+            child = subprocess.Popen([str(self.app / 'Contents/MacOS/AjarApp')], cwd=self.repo)
             try:
                 result = child.wait()
             except KeyboardInterrupt:

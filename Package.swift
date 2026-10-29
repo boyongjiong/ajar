@@ -2,21 +2,21 @@
 import PackageDescription
 
 let package = Package(
-    name: "LeftOpen",
+    name: "Ajar",
     platforms: [.macOS(.v14)],
     products: [
-        .library(name: "LeftOpenCore", targets: ["LeftOpenCore"]),
-        .executable(name: "LeftOpenApp", targets: ["LeftOpenApp"]),
-        .executable(name: "leftopen", targets: ["LeftOpenCLI"]),
+        .library(name: "AjarCore", targets: ["AjarCore"]),
+        .executable(name: "AjarApp", targets: ["AjarApp"]),
+        .executable(name: "ajar", targets: ["AjarCLI"]),
     ],
     targets: [
-        .target(name: "LeftOpenCore", path: "Sources/LeftOpenCore"),
-        .executableTarget(name: "LeftOpenApp", dependencies: ["LeftOpenCore"], path: "Sources/LeftOpenApp",
-                          resources: [.copy("Resources/FranklinSignature.svg"), .copy("Resources/GitHubMark.svg"),
+        .target(name: "AjarCore", path: "Sources/AjarCore"),
+        .executableTarget(name: "AjarApp", dependencies: ["AjarCore"], path: "Sources/AjarApp",
+                          resources: [.copy("Resources/GitHubMark.svg"),
                                       .copy("Resources/DoorClose.aiff"), .copy("Resources/DoorOpen.aiff"),
                                       .copy("Resources/DancingDog.gif")]),
-        .executableTarget(name: "LeftOpenCLI", dependencies: ["LeftOpenCore"], path: "Sources/LeftOpenCLI"),
-        .testTarget(name: "LeftOpenAppTests", dependencies: ["LeftOpenApp"], path: "Tests/LeftOpenAppTests"),
-        .testTarget(name: "LeftOpenCoreTests", dependencies: ["LeftOpenCore"], path: "Tests/LeftOpenCoreTests"),
+        .executableTarget(name: "AjarCLI", dependencies: ["AjarCore"], path: "Sources/AjarCLI"),
+        .testTarget(name: "AjarAppTests", dependencies: ["AjarApp"], path: "Tests/AjarAppTests"),
+        .testTarget(name: "AjarCoreTests", dependencies: ["AjarCore"], path: "Tests/AjarCoreTests"),
     ]
 )

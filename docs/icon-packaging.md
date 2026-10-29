@@ -14,7 +14,7 @@ The saved public 0.5.6 beta package has exactly the same ICNS SHA-256 as source:
 `f0c9eb5af703b8471b3cd2a4ec2515f8a9fe6c33a343602f7efbf88cfdb35678`.
 
 Commit `6d2b6cd` introduced a flattened image named
-`assets/leftopen-iOS-Default-1024@1x.png`. Its SHA-256 equals the current
+`assets/ajar-iOS-Default-1024@1x.png`. Its SHA-256 equals the current
 `docs/assets/AppIcon.png`; the latter is pixel-identical to the ICNS 1024px image.
 This establishes flattened-image provenance, not the original export settings.
 
@@ -59,8 +59,8 @@ explicitly; the verifier rejects an alternate icon selector or top-level Assets.
 ```sh
 swift Scripts/legacy-app-icon.swift audit Resources/AppIcon.icns
 python3 Tests/test_legacy_app_icon.py
-LEFTOPEN_OUTPUT_DIR=/path/to/new/output Scripts/build-app.sh
-swift Scripts/legacy-app-icon.swift verify Resources/AppIcon.icns /path/to/new/output/LeftOpen.app
+AJAR_OUTPUT_DIR=/path/to/new/output Scripts/build-app.sh
+swift Scripts/legacy-app-icon.swift verify Resources/AppIcon.icns /path/to/new/output/Ajar.app
 ```
 
 ## Verification boundary

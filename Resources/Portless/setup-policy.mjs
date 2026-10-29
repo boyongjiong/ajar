@@ -27,7 +27,7 @@ export function repairUserDirectories(home, uid, gid, io = fs) {
     const info = io.lstatSync(ancestor);
     if (info.isSymbolicLink() || !info.isDirectory()) throw new Error('unsafePath');
   }
-  const parent = path.join(support, 'LeftOpen');
+  const parent = path.join(support, 'Ajar');
   const directory = path.join(parent, 'Portless');
   // Check BOTH targets and the existing state tree before changing either owner.
   for (const target of [parent, directory]) {
@@ -62,8 +62,8 @@ export function checkedSetupResult(result, stage) {
 
 export function installAddressService(node, cli, directory, env, spawn) {
   const port = proxyPort(env.PORTLESS_PORT);
-  // launchd refuses bootstrap for a disabled label. Enable only LeftOpen's label first.
-  checkedSetupResult(spawn('/bin/launchctl', ['enable', 'system/app.leftopen.portless.proxy'],
+  // launchd refuses bootstrap for a disabled label. Enable only Ajar's label first.
+  checkedSetupResult(spawn('/bin/launchctl', ['enable', 'system/io.github.boyongjiong.ajar.portless.proxy'],
     { env, encoding: 'utf8', timeout: 30000, maxBuffer: 1024 * 1024 }), 'launchdEnableFailed');
   checkedSetupResult(spawn(node, [cli, 'service', 'install', '--state-dir', directory, '--https', '--port', String(port)],
     { env, encoding: 'utf8', timeout: 120000, maxBuffer: 1024 * 1024 }), 'serviceInstallFailed');

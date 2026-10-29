@@ -2,11 +2,11 @@
 set -euo pipefail
 
 if [[ $# -ne 1 ]]; then
-  print -u2 "Usage: $0 /path/to/LeftOpen.app"
+  print -u2 "Usage: $0 /path/to/Ajar.app"
   exit 1
 fi
 
-for executable in LeftOpenApp leftopen; do
+for executable in AjarApp ajar; do
   binary_path="$1/Contents/MacOS/${executable}"
   if [[ ! -x "$binary_path" ]]; then
     print -u2 "Missing app executable: $binary_path"

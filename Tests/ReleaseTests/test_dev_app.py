@@ -19,7 +19,7 @@ class LocalAppTests(unittest.TestCase):
 
     def owned(self):
         self.build.directory.mkdir(parents=True)
-        (self.build.directory / dev.MARKER).write_text('leftopen-local-build-v1\n')
+        (self.build.directory / dev.MARKER).write_text('ajar-local-build-v1\n')
         (self.build.app / 'Contents').mkdir(parents=True)
         (self.build.app / 'Contents/Info.plist').write_text('fixture')
 
@@ -39,7 +39,7 @@ class LocalAppTests(unittest.TestCase):
 
     def test_active_app_or_runtime_prevents_removal(self):
         self.owned()
-        for executable in ['Contents/MacOS/LeftOpenApp', 'Contents/Resources/Portless/node-arm64']:
+        for executable in ['Contents/MacOS/AjarApp', 'Contents/Resources/Portless/node-arm64']:
             output = str(self.build.app.resolve() / executable) + '\n'
             with patch.object(dev.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0, output, '')):
                 with self.assertRaises(RuntimeError):
@@ -79,7 +79,7 @@ class LocalAppTests(unittest.TestCase):
             popen.return_value.poll.return_value = 0
             self.build.run()
         clean.assert_called_once()
-        self.assertEqual(popen.call_args.args[0], [str(self.build.app / 'Contents/MacOS/LeftOpenApp')])
+        self.assertEqual(popen.call_args.args[0], [str(self.build.app / 'Contents/MacOS/AjarApp')])
 
     def test_version_describes_commits_since_latest_stable_release(self):
         def described(output, code=0):
@@ -97,7 +97,7 @@ class LocalAppTests(unittest.TestCase):
     def test_build_passes_described_version_to_packaging(self):
         with patch.object(dev, 'describe_version', return_value='0.5.8-dev.1+abc1234'), patch.object(dev.subprocess, 'run') as run, patch.object(self.build, 'active', return_value=False), patch.object(self.build, 'unregister'):
             self.build.build()
-        self.assertEqual(run.call_args.kwargs['env']['LEFTOPEN_VERSION'], '0.5.8-dev.1+abc1234')
+        self.assertEqual(run.call_args.kwargs['env']['AJAR_VERSION'], '0.5.8-dev.1+abc1234')
 
     def test_unregistered_bundle_is_cleanable_but_other_errors_preserve_output(self):
         self.owned()

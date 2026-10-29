@@ -10,13 +10,13 @@ import { validateService, validateTree, removingHosts, removeCertificate, checkA
 const home = '/Users/fixture';
 const service = () => ({Label: label, ProgramArguments: [`${runtime}/node-arm64`, `${runtime}/package/dist/cli.js`,
   'proxy', 'start', '--foreground', '--port', '443', '--https', '--skip-trust'],
-  EnvironmentVariables: {PORTLESS_STATE_DIR: `${home}/Library/Application Support/LeftOpen/Portless`}});
+  EnvironmentVariables: {PORTLESS_STATE_DIR: `${home}/Library/Application Support/Ajar/Portless`}});
 
 test('service removal requires the exact runtime, label and original user state directory', () => {
   validateService(service(), home);
   for (const value of [{...service(), Label: 'sh.portless.proxy'},
     {...service(), ProgramArguments: ['/opt/homebrew/bin/node', `${runtime}/package/dist/cli.js`]},
-    {...service(), EnvironmentVariables: {PORTLESS_STATE_DIR: '/Users/other/Library/Application Support/LeftOpen/Portless'}},
+    {...service(), EnvironmentVariables: {PORTLESS_STATE_DIR: '/Users/other/Library/Application Support/Ajar/Portless'}},
     {...service(), ProgramArguments: [`${runtime}/node-arm64`, '/tmp/project.js']}]) {
     assert.throws(() => validateService(value, home), /differentOwner/);
   }
@@ -30,18 +30,18 @@ test('missing original certificate permits service cleanup but never keychain de
   assert.throws(() => certificateCleanup(true, '-', true), /certificateChanged/);
 });
 
-test('remove only LeftOpen hosts entries, preserving unrelated Portless and user mappings', () => {
+test('remove only Ajar hosts entries, preserving unrelated Portless and user mappings', () => {
   const untouched = '127.0.0.1 localhost\n# portless-start\n127.0.0.1 other.localhost\n# portless-end\n127.0.0.1 personal.localhost\n';
-  const original = untouched + '# leftopen-portless-start\n127.0.0.1 alpha.localhost beta.localhost\n::1 alpha.localhost\n# leftopen-portless-end\n127.0.0.1 legacy.localhost # LeftOpen fixed address\n';
+  const original = untouched + '# ajar-portless-start\n127.0.0.1 alpha.localhost beta.localhost\n::1 alpha.localhost\n# ajar-portless-end\n127.0.0.1 legacy.localhost # Ajar fixed address\n';
   assert.equal(removingHosts(original), untouched);
   assert.equal(removingHosts(untouched), untouched);
 });
 
 test('malformed or unexpected owned blocks abort instead of discarding user edits', () => {
-  for (const value of ['# leftopen-portless-start\n', '# leftopen-portless-end\n',
-    '# leftopen-portless-start\n192.168.1.2 private.example\n# leftopen-portless-end\n',
-    '# leftopen-portless-start\n127.0.0.1 unrelated.example\n# leftopen-portless-end\n',
-    '# leftopen-portless-start\n# leftopen-portless-start\n# leftopen-portless-end\n']) {
+  for (const value of ['# ajar-portless-start\n', '# ajar-portless-end\n',
+    '# ajar-portless-start\n192.168.1.2 private.example\n# ajar-portless-end\n',
+    '# ajar-portless-start\n127.0.0.1 unrelated.example\n# ajar-portless-end\n',
+    '# ajar-portless-start\n# ajar-portless-start\n# ajar-portless-end\n']) {
     assert.throws(() => removingHosts(value), /unsafeHosts/);
   }
 });
@@ -72,7 +72,7 @@ test('locked keychain and cancelled deletion remain failures; state must be reta
 });
 
 test('real filesystem rejects nested, dangling and ancestor symlinks without touching targets', t => {
-  const directory = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'leftopen-uninstall-test-'));
+  const directory = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ajar-uninstall-test-'));
   t.after(() => fs.rmSync(directory, {recursive: true, force: true}));
   fs.mkdirSync(path.join(directory, 'state'));
   fs.writeFileSync(path.join(directory, 'outside'), 'keep');
@@ -90,7 +90,7 @@ test('real filesystem rejects nested, dangling and ancestor symlinks without tou
 });
 
 test('reject another owner without mutation', t => {
-  const directory = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'leftopen-owner-test-'));
+  const directory = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ajar-owner-test-'));
   t.after(() => fs.rmSync(directory, {recursive: true, force: true}));
   assert.throws(() => validateTree(directory, [process.getuid() + 1]), /unsafePath/);
   assert.ok(fs.statSync(directory).isDirectory());

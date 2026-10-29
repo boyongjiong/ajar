@@ -21,7 +21,7 @@ func run(_ arguments: [String]) throws {
     try require(task.terminationStatus == 0, "iconutil failed: \(task.terminationStatus)")
 }
 func scratch<T>(_ body: (URL) throws -> T) throws -> T {
-    let url = fm.temporaryDirectory.appendingPathComponent("leftopen-icon-\(UUID().uuidString)")
+    let url = fm.temporaryDirectory.appendingPathComponent("ajar-icon-\(UUID().uuidString)")
     try fm.createDirectory(at: url, withIntermediateDirectories: false)
     defer { try? fm.removeItem(at: url) }
     return try body(url)

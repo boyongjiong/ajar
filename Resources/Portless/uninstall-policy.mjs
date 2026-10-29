@@ -29,13 +29,13 @@ export function removingHosts(original) {
   let inBlock = false, blocks = 0;
   const host = '[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\\.localhost';
   const entry = new RegExp(`^(?:127\\.0\\.0\\.1|::1)\\s+(?:${host})(?:\\s+${host})*\\s*$`);
-  const manual = new RegExp(`^127\\.0\\.0\\.1\\s+${host}\\s+# LeftOpen fixed address\\s*$`);
+  const manual = new RegExp(`^127\\.0\\.0\\.1\\s+${host}\\s+# Ajar fixed address\\s*$`);
   for (const line of lines) {
-    if (line === '# leftopen-portless-start') {
+    if (line === '# ajar-portless-start') {
       if (inBlock || ++blocks > 1) throw new Error('unsafeHosts');
       inBlock = true; continue;
     }
-    if (line === '# leftopen-portless-end') {
+    if (line === '# ajar-portless-end') {
       if (!inBlock) throw new Error('unsafeHosts');
       inBlock = false; continue;
     }

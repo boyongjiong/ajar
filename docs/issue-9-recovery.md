@@ -25,7 +25,7 @@ do not modify keychain trust or claim that GUI authorization was verified.
 
 ## Changes
 
-- Repair only `~/Library/Application Support/LeftOpen` and its `Portless` child:
+- Repair only `~/Library/Application Support/Ajar` and its `Portless` child:
   accept root/current-user ownership, reject foreign owners and symbolic links,
   use directory descriptors for chown/chmod, and set these two directories to 0700.
   Do not change ancestors, certificate/private-key modes, unrelated descendants,
@@ -34,7 +34,7 @@ do not modify keychain trust or claim that GUI authorization was verified.
   a real open operation. Missing/inaccessible certificates reach installation
   repair even when the service plist already exists. A readable, untrusted CA
   still uses the existing trust-only path.
-- Enable only `system/app.leftopen.portless.proxy` before invoking upstream
+- Enable only `system/io.github.boyongjiong.ajar.portless.proxy` before invoking upstream
   service installation, so a disabled label can be bootstrapped again.
   Existing port/PID/runtime identity checks run before this operation.
 - Expose allowlisted failure stages and exit codes without copying raw subprocess
@@ -52,7 +52,7 @@ On the development Mac running macOS 26.6:
 - `swift test`: 55 tests passed. Includes real filesystem ENOENT/EACCES cases,
   symbolic-link rejection, installation-vs-trust decisions, diagnostic filtering,
   and global-package eligibility.
-- `LEFTOPEN_TEST_LAUNCHD=1 .build/portless-runtime/node-arm64 --test Tests/PortlessTests/*.test.mjs`:
+- `AJAR_TEST_LAUNCHD=1 .build/portless-runtime/node-arm64 --test Tests/PortlessTests/*.test.mjs`:
   19 tests passed using the bundled Node runtime. Includes real HTTP, HTTPS,
   WebSocket routing, directory creation, targeted permission changes, and an
   isolated GUI-domain launchd agent: disabled bootstrap fails, enable then bootstrap succeeds.
@@ -73,7 +73,7 @@ production launchd service, or installed app was changed for testing.
 On a disposable macOS 15.7.5 account, verify the full Settings flow with:
 
 1. Fresh user directories; both become user-owned/0700 and HTTPS becomes ready.
-2. A root-owned/0700 `LeftOpen` parent with existing CA files; setup repairs the
+2. A root-owned/0700 `Ajar` parent with existing CA files; setup repairs the
    two directories and can read the existing CA without broad permission changes.
 3. A missing CA with an existing plist; setup proceeds to installation recovery.
 4. A disabled, unloaded system service with a trusted CA; setup re-enables it

@@ -2,8 +2,8 @@
 import fs from 'node:fs';
 import { commandDiagnostic } from './diagnostics.mjs';
 import { proxyPort } from './proxy-config.mjs';
-export const label = 'app.leftopen.portless.proxy';
-export const runtime = '/Library/Application Support/LeftOpen/Portless';
+export const label = 'io.github.boyongjiong.ajar.portless.proxy';
+export const runtime = '/Library/Application Support/Ajar/Portless';
 export const plist = `/Library/LaunchDaemons/${label}.plist`;
 const target = `system/${label}`;
 
@@ -16,7 +16,7 @@ export function validateService(value, home) {
       ![`${runtime}/node-arm64`, `${runtime}/node-x64`].includes(args[0]) ||
       JSON.stringify(args.slice(1)) !== JSON.stringify(tail) ||
       (value.EnvironmentVariables?.PORTLESS_PORT !== undefined && value.EnvironmentVariables.PORTLESS_PORT !== String(port)) ||
-      value.EnvironmentVariables?.PORTLESS_STATE_DIR !== `${home}/Library/Application Support/LeftOpen/Portless`) {
+      value.EnvironmentVariables?.PORTLESS_STATE_DIR !== `${home}/Library/Application Support/Ajar/Portless`) {
     throw new Error('differentOwner');
   }
   return args;
@@ -54,7 +54,7 @@ export function ownedService(home, run, io = fs) {
   };
   const loadedArgs = text.match(/^\targuments = \{\n([\s\S]*?)^\t\}/m)?.[1]
     .split('\n').map(line => line.trim()).filter(Boolean);
-  const directory = `${home}/Library/Application Support/LeftOpen/Portless`;
+  const directory = `${home}/Library/Application Support/Ajar/Portless`;
   // Check loaded state too: a matching plist alone does not identify a previously loaded job.
   const environments = [...text.matchAll(/^\t\tPORTLESS_STATE_DIR => (.*)$/gm)];
   if (!text.startsWith(`${target} = {\n`) || field('path') !== plist || field('program') !== args[0] ||

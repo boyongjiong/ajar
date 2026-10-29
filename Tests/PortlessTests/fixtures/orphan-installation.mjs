@@ -12,14 +12,14 @@ const isSource = file => {
   const name = file instanceof URL ? fileURLToPath(file) : String(file);
   return name.startsWith(sourceRoot) && name.endsWith('.mjs');
 };
-const mode = process.env.LEFTOPEN_FIXTURE_MODE;
-const home = '/Users/fixture', state = `${home}/Library/Application Support/LeftOpen/Portless`;
-const runtime = '/Library/Application Support/LeftOpen/Portless';
-const plist = '/Library/LaunchDaemons/app.leftopen.portless.proxy.plist';
+const mode = process.env.AJAR_FIXTURE_MODE;
+const home = '/Users/fixture', state = `${home}/Library/Application Support/Ajar/Portless`;
+const runtime = '/Library/Application Support/Ajar/Portless';
+const plist = '/Library/LaunchDaemons/io.github.boyongjiong.ajar.portless.proxy.plist';
 const node = `${runtime}/node-${process.arch === 'arm64' ? 'arm64' : 'x64'}`;
-const args = [node, `${runtime}/package/dist/cli.js`, 'proxy', 'start', '--foreground', '--port', process.env.LEFTOPEN_FIXTURE_PORT ?? '443', '--https', '--skip-trust'];
-const foreignPort = Number(process.env.LEFTOPEN_FIXTURE_FOREIGN_PORT ?? 0);
-const value = {Label: 'app.leftopen.portless.proxy', ProgramArguments: args,
+const args = [node, `${runtime}/package/dist/cli.js`, 'proxy', 'start', '--foreground', '--port', process.env.AJAR_FIXTURE_PORT ?? '443', '--https', '--skip-trust'];
+const foreignPort = Number(process.env.AJAR_FIXTURE_FOREIGN_PORT ?? 0);
+const value = {Label: 'io.github.boyongjiong.ajar.portless.proxy', ProgramArguments: args,
   EnvironmentVariables: {PORTLESS_STATE_DIR: mode === 'other-user' ? '/Users/other/state' : state}};
 let loaded = !['fresh', 'dormant'].includes(mode);
 let inspections = 0;
@@ -82,7 +82,7 @@ childProcess.spawnSync = (command, argv) => {
       }
       if (!loaded) return {status: 113, stderr: 'Could not find service', stdout: ''};
       const pid = mode === 'pid-changed' && inspections > 1 ? 4480 : 4478;
-      return ok(`system/app.leftopen.portless.proxy = {\n\tpath = ${plist}\n\tstate = running\n\tprogram = ${node}\n\targuments = {\n${args.map(arg => '\t\t' + arg).join('\n')}\n\t}\n\tenvironment = {\n\t\tPORTLESS_STATE_DIR => ${mode === 'loaded-mismatch' ? '/Users/other/state' : state}\n\t}\n\tpid = ${pid}\n}\n`);
+      return ok(`system/io.github.boyongjiong.ajar.portless.proxy = {\n\tpath = ${plist}\n\tstate = running\n\tprogram = ${node}\n\targuments = {\n${args.map(arg => '\t\t' + arg).join('\n')}\n\t}\n\tenvironment = {\n\t\tPORTLESS_STATE_DIR => ${mode === 'loaded-mismatch' ? '/Users/other/state' : state}\n\t}\n\tpid = ${pid}\n}\n`);
     }
     if (argv[0] === 'bootout') {
       stopRequested = true;

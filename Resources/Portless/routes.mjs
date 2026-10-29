@@ -20,8 +20,8 @@ export function syncRoutes(directory, desired) {
   const store = new RouteStore(directory);
   let previous = { routes: [] };
   let managed = [];
-  try { previous = JSON.parse(fs.readFileSync(path.join(directory, 'leftopen-leases.json'), 'utf8')); } catch {}
-  try { managed = JSON.parse(fs.readFileSync(path.join(directory, 'leftopen-managed.json'), 'utf8')); } catch {}
+  try { previous = JSON.parse(fs.readFileSync(path.join(directory, 'ajar-leases.json'), 'utf8')); } catch {}
+  try { managed = JSON.parse(fs.readFileSync(path.join(directory, 'ajar-managed.json'), 'utf8')); } catch {}
   const existing = store.loadRoutes();
   // Check every collision before changing gates: another live session must remain reachable on failure.
   for (const route of desired) {
@@ -32,7 +32,7 @@ export function syncRoutes(directory, desired) {
     }
   }
   // Register the ownership gate before modifying the upstream route table.
-  atomicJSON(path.join(directory, 'leftopen-managed.json'), [...new Set([...managed, ...hostnames])]);
+  atomicJSON(path.join(directory, 'ajar-managed.json'), [...new Set([...managed, ...hostnames])]);
   const leases = [];
   for (const route of desired) {
     const registered = existing.find(value => value.hostname === route.hostname);
@@ -48,7 +48,7 @@ export function syncRoutes(directory, desired) {
   for (const old of previous.routes) {
     if (!hostnames.has(old.hostname)) store.removeRoute(old.hostname, old.ownerPid);
   }
-  atomicJSON(path.join(directory, 'leftopen-leases.json'), { expiresAt: Date.now() + 15000, routes: leases });
+  atomicJSON(path.join(directory, 'ajar-leases.json'), { expiresAt: Date.now() + 15000, routes: leases });
   // Portless watches its route table; a no-op add refreshes that watcher after the lease is ready.
   for (const lease of leases) store.addRoute(lease.hostname, lease.port, lease.ownerPid);
   return leases;

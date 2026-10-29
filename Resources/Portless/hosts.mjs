@@ -22,7 +22,7 @@ export function addingHosts(original, names) {
     }
     if (entries.some(parts => parts[0] === '127.0.0.1')) continue;
     if (!result.endsWith('\n')) result += '\n';
-    result += `127.0.0.1 ${name} # LeftOpen fixed address\n`;
+    result += `127.0.0.1 ${name} # Ajar fixed address\n`;
   }
   return result;
 }
@@ -32,7 +32,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const updated = addingHosts(original, process.argv.slice(2));
   if (updated !== original) {
     const metadata = fs.statSync('/etc/hosts');
-    const temporary = `/etc/.leftopen-hosts-${crypto.randomUUID()}`;
+    const temporary = `/etc/.ajar-hosts-${crypto.randomUUID()}`;
     try {
       fs.writeFileSync(temporary, updated, { mode: metadata.mode & 0o777, flag: 'wx' });
       fs.chownSync(temporary, metadata.uid, metadata.gid);

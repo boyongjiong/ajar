@@ -1,15 +1,12 @@
 <div align="center">
-  <img src="assets/logo.svg" alt="LeftOpen Logo" width="48" height="80" />
-  <h1>LeftOpen</h1>
-  <p><strong>Native macOS Menu Bar Port Manager &amp; CLI</strong></p>
-  <p><em>See what your tools left running on localhost, identify projects, and gently close them.</em></p>
+  <img src="assets/logo.svg" alt="Ajar Logo" width="48" height="80" />
+  <h1>Ajar</h1>
+  <p><strong>Localhost Port Manager for the macOS Menu Bar &amp; CLI</strong></p>
+  <p><em>See which project owns every localhost port, what each port is for, and close the ones you no longer need — safely.</em></p>
 
   <p>
-    <a href="https://leftopen.songhai.site/"><img src="https://img.shields.io/badge/website-songhai.site-211811?style=flat-square" alt="Website" /></a>
-    <a href="https://github.com/SonghaiFan/leftopen/releases/latest"><img src="https://img.shields.io/github/v/release/SonghaiFan/leftopen?color=black&style=flat-square" alt="Release" /></a>
-    <a href="https://github.com/SonghaiFan/homebrew-tap"><img src="https://img.shields.io/badge/homebrew-cask-211811?style=flat-square" alt="Homebrew Cask" /></a>
+    <a href="https://boyongjiong.github.io/ajar/"><img src="https://img.shields.io/badge/website-ajar-211811?style=flat-square" alt="Website" /></a>
     <img src="https://img.shields.io/badge/macOS-14.0%2B-555555?style=flat-square" alt="macOS 14+" />
-    <img src="https://img.shields.io/badge/Apple%20Notarized-Accepted-211811?style=flat-square" alt="Apple Notarized" />
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-555555?style=flat-square" alt="License: MIT" /></a>
   </p>
 
@@ -18,36 +15,36 @@
   <br />
   <picture>
     <source srcset="assets/preview-dark.png" media="(prefers-color-scheme: dark)">
-    <img src="assets/preview.png" alt="LeftOpen menu bar panel: closable ports first, apps and system services folded away" width="375" />
+    <img src="assets/preview.png" alt="Ajar menu bar panel: closable ports first, apps and system services folded away" width="375" />
   </picture>
   <br /><br />
 </div>
 
-> When I have several coding agents working in parallel, dev servers and test runners keep starting up on different ports. By the end of the day there are always a few still running.
->
-> Existing tools are either too much, or only tell you "port in use" without saying which process it is or which project it came from.
->
-> So I made **LeftOpen**. It sits quietly in the menu bar and shows you the listening ports, the processes behind them and the projects they probably belong to. Once you've had a look, you close the ones you no longer need.
->
-> *Close the doors that were left ajar, gently.*
+With several coding agents working in parallel, dev servers, test runners and build daemons keep starting on different ports, and by the end of the day a few are always still running. `lsof` and `kill-port` say a port is in use, but not which project it belongs to or what it does.
 
----
+**Ajar** sits in the menu bar and shows every listening port, the process and project behind it, and what the port is for. Close the doors that were left ajar — gently.
 
-> This project is evolving quickly and will remain free and open source forever. If you’ve downloaded it or are using it, please **Star** the repository and [**Follow @SonghaiFan**](https://github.com/SonghaiFan) to keep up with my projects. Your Star is my biggest source of support and motivation to keep building.
+> Ajar is a fork of [LeftOpen](https://github.com/SonghaiFan/leftopen) by Songhai Fan. See [Credits](#credits).
 
 ## Installation
 
-### Homebrew (recommended)
+Ajar has no published release yet; build it from source. Requires Xcode (the full app, not only the Command Line Tools) on macOS Sonoma (14.0+), Apple Silicon or Intel.
 
 ```bash
-brew install --cask songhaifan/tap/leftopen
+git clone https://github.com/boyongjiong/ajar.git
+cd ajar
+python3 Scripts/dev-app.py run        # build and run a local test app
 ```
 
-Supports Apple Silicon and Intel Macs running macOS Sonoma (14.0+). The app and bundled CLI are universal binaries, signed with a Developer ID and notarized by Apple.
+To install your own build:
 
-### Manual download
+```bash
+AJAR_OUTPUT_DIR=dist/local zsh Scripts/build-app.sh
+cp -R dist/local/Ajar.app /Applications/
+ln -sf /Applications/Ajar.app/Contents/MacOS/ajar /opt/homebrew/bin/ajar   # optional: CLI
+```
 
-Get `LeftOpen-release.zip` from [GitHub Releases](https://github.com/SonghaiFan/leftopen/releases/latest), unzip, and move `LeftOpen.app` to `/Applications`.
+Local builds are ad-hoc signed, which is fine on your own Mac. If downloads fail with `CERTIFICATE_VERIFY_FAILED`, run the *Install Certificates* command that ships with python.org Python, or set `SSL_CERT_FILE=/etc/ssl/cert.pem`.
 
 ---
 
@@ -62,36 +59,38 @@ Get `LeftOpen-release.zip` from [GitHub Releases](https://github.com/SonghaiFan/
 - **Appearance.** Choose System, Light or Dark in **Settings → General**, alongside language, login startup and sounds. **Projects** shows the local address service's health.
 - **Quiet by default.** Native SwiftUI `MenuBarExtra`. No Dock icon, no telemetry, and no background service unless you opt into fixed addresses. The only request that leaves this Mac is a daily check of the latest GitHub release, which you can turn off in Settings.
 - **Fixed project addresses.** Give a dev server a stable `https://myapp.localhost` URL that follows it across port changes, powered by bundled [Portless](https://github.com/vercel-labs/portless). See [below](#fixed-project-addresses).
-- **Same engine in the terminal.** The app ships a `leftopen` CLI with identical inference and safety rules.
+- **Says what each port is for.** A process with several ports shows each one's role — Spring Actuator, app server, a page by its title, a JSON API, or TCP that doesn't speak HTTP — from two bounded requests on this Mac's own addresses.
+- **Names build daemons and tunnels.** Gradle, Kotlin and Maven daemons and sshuttle are shown as themselves instead of the project folder they were started from, and "Close All" leaves them alone.
+- **Same engine in the terminal.** The app ships an `ajar` CLI with identical inference and safety rules.
 
 ---
 
 ## Fixed project addresses
 
-Dev servers move between ports; their address doesn't have to. LeftOpen bundles [Portless](https://github.com/vercel-labs/portless) 0.15.7 and Node 24.14.0, so there's nothing extra to install.
+Dev servers move between ports; their address doesn't have to. Ajar bundles [Portless](https://github.com/vercel-labs/portless) 0.15.7 and Node 24.14.0, so there's nothing extra to install.
 
 1. **One-time setup:** Turn on **Settings → Projects → Fixed addresses**. macOS asks for authorization to trust a local CA, install a loopback-only HTTPS service on the selected proxy port (443 by default), and manage exact `/etc/hosts` entries. Only explicit Settings actions ask; project actions and background scans never do.
 2. **Per project:** start the project as usual, then click **Enable fixed address** in its port details. It's reachable at `https://myapp.localhost`.
 
 How it behaves:
 
-- **Verified before forwarding.** LeftOpen checks the project root, executable, working directory, hashed command identity and live listener before following a port change. Ambiguous or unrelated listeners, HTTPS-only upstreams and non-web ports are never forwarded. If the dev server rejects the hostname, the details show why; project files are never edited.
-- **Start stopped projects.** Saved projects that aren't running show **Start** when they have a dev script, using Portless's own launcher (free-port allocation, framework arguments, worktree naming). Projects without a dev script can declare one in `.claude/launch.json` (`runtimeExecutable`, `runtimeArgs`, `port`); LeftOpen runs it through `portless run` without a shell, only when you click **Start**. `portless.json` and the `"portless"` key in `package.json` are read by Portless itself. LeftOpen never reconstructs commands from process arguments. Projects with neither can right-click their shortcut and choose **Copy Setup Prompt for AI**, then paste it into a coding agent to create `.claude/launch.json`.
-- **Leases, not permanent rules.** Mappings for observed services use short leases that expire when LeftOpen stops scanning and restore on launch. Disabling an address doesn't stop the project. The HTTPS service stays installed across app quits; if port 443 is already taken, LeftOpen reports it instead of taking over.
-- **For agents and scripts:** `leftopen url [name|port|path]` prints verified addresses (`--json` for structured output), and `leftopen --json` includes `fixedURL` for matching services.
+- **Verified before forwarding.** Ajar checks the project root, executable, working directory, hashed command identity and live listener before following a port change. Ambiguous or unrelated listeners, HTTPS-only upstreams and non-web ports are never forwarded. If the dev server rejects the hostname, the details show why; project files are never edited.
+- **Start stopped projects.** Saved projects that aren't running show **Start** when they have a dev script, using Portless's own launcher (free-port allocation, framework arguments, worktree naming). Projects without a dev script can declare one in `.claude/launch.json` (`runtimeExecutable`, `runtimeArgs`, `port`); Ajar runs it through `portless run` without a shell, only when you click **Start**. `portless.json` and the `"portless"` key in `package.json` are read by Portless itself. Ajar never reconstructs commands from process arguments. Projects with neither can right-click their shortcut and choose **Copy Setup Prompt for AI**, then paste it into a coding agent to create `.claude/launch.json`.
+- **Leases, not permanent rules.** Mappings for observed services use short leases that expire when Ajar stops scanning and restore on launch. Disabling an address doesn't stop the project. The HTTPS service stays installed across app quits; if port 443 is already taken, Ajar reports it instead of taking over.
+- **For agents and scripts:** `ajar url [name|port|path]` prints verified addresses (`--json` for structured output), and `ajar --json` includes `fixedURL` for matching services.
 
 Earlier HTTP addresses keep working; finish the HTTPS upgrade from the same Settings page. Portless (Apache-2.0) and Node ship with their licenses.
 
-**Address settings:** Settings → Projects has a single fixed-address row, with no manual port configuration. Initial setup prefers 443, automatically trying 8443–8462 on conflict within the same authorization. Successful setup remembers the selected port and includes it in opened/copied URLs. Other listeners are never stopped; failures retain copyable diagnostics. Ports are not automatically migrated while LeftOpen-launched projects run. Turning off removes managed routes but preserves bindings, certificates and the proxy without stopping project servers; stop LeftOpen-launched projects first.
+**Address settings:** Settings → Projects has a single fixed-address row, with no manual port configuration. Initial setup prefers 443, automatically trying 8443–8462 on conflict within the same authorization. Successful setup remembers the selected port and includes it in opened/copied URLs. Other listeners are never stopped; failures retain copyable diagnostics. Ports are not automatically migrated while Ajar-launched projects run. Turning off removes managed routes but preserves bindings, certificates and the proxy without stopping project servers; stop Ajar-launched projects first.
 
 ---
 
-## Why LeftOpen? (Common Use Cases)
+## Why Ajar? (Common Use Cases)
 
-- **Fix "Port already in use" (`EADDRINUSE`)**: When your dev server fails because port 3000, 5173, or 8080 is blocked by a lingering process, LeftOpen shows you what's running and shuts it down gently—without restarting your terminal or machine.
-- **Identify the project, not just a generic `node` or `python` PID**: Tools like `lsof -i` or `kill-port` only report raw PIDs or ambiguous process names. LeftOpen tracks the working directory and project root (`package.json`, `Cargo.toml`, `pyproject.toml`, `go.mod`, `.git`), giving you full context before taking action.
+- **Fix "Port already in use" (`EADDRINUSE`)**: When your dev server fails because port 3000, 5173, or 8080 is blocked by a lingering process, Ajar shows you what's running and shuts it down gently—without restarting your terminal or machine.
+- **Identify the project, not just a generic `node` or `python` PID**: Tools like `lsof -i` or `kill-port` only report raw PIDs or ambiguous process names. Ajar tracks the working directory and project root (`package.json`, `Cargo.toml`, `pyproject.toml`, `go.mod`, `.git`), giving you full context before taking action.
 - **Spot accidental LAN exposure**: See at a glance whether a port is bound strictly to `127.0.0.1` (local only) or `0.0.0.0` (accessible to anyone on your local network/Wi-Fi).
-- **Graceful SIGTERM vs. destructive `kill -9`**: Unlike blunt force-killing scripts, LeftOpen re-verifies PID and start time, shows sibling ports, and issues a standard `SIGTERM` so servers can clean up sockets, flush logs, and exit cleanly.
+- **Graceful SIGTERM vs. destructive `kill -9`**: Unlike blunt force-killing scripts, Ajar re-verifies PID and start time, shows sibling ports, and issues a standard `SIGTERM` so servers can clean up sockets, flush logs, and exit cleanly.
 
 ---
 
@@ -100,28 +99,28 @@ Earlier HTTP addresses keep working; finish the HTTPS upgrade from the same Sett
 Available in the terminal right after installing:
 
 ```bash
-# List every listening port and its owner (or: leftopen list)
-leftopen
+# List every listening port and its owner (or: ajar list)
+ajar
 
 # Explain one port
-leftopen 3000
+ajar 3000
 
 # Open http://localhost:3000 in the default browser
-leftopen open 3000
+ajar open 3000
 
 # Print a project's verified fixed address (e.g. https://myapp.localhost)
-leftopen url myapp
+ajar url myapp
 
 # Close the process on a port (SIGTERM, asks first)
-leftopen close 3000
+ajar close 3000
 
 # Structured JSON output
-leftopen --json
+ajar --json
 ```
 
 Sample output:
 ```text
-LEFT OPEN
+AJAR
 26 listening ports · 17 processes · 1 projects · 8 LAN-visible
 
 MY PROJECTS (2)
@@ -163,7 +162,7 @@ python3 Scripts/dev-app.py run
 python3 Scripts/dev-app.py clean
 ```
 
-Local builds use the name **LeftOpen Test** and a separate bundle identifier. They never install into `/Applications`. Cleanup refuses active app/runtime processes and only removes its managed output. Quit the test app before cleaning. Fixed-address services and other user data are not reset. CI and release packaging continue to set an explicit `LEFTOPEN_OUTPUT_DIR`; do not use versioned `dist/` folders for routine local tests.
+Local builds use the name **Ajar Test** and a separate bundle identifier. They never install into `/Applications`. Cleanup refuses active app/runtime processes and only removes its managed output. Quit the test app before cleaning. Fixed-address services and other user data are not reset. CI and release packaging continue to set an explicit `AJAR_OUTPUT_DIR`; do not use versioned `dist/` folders for routine local tests.
 
 ---
 
@@ -173,7 +172,20 @@ Local builds use the name **LeftOpen Test** and a separate bundle identifier. Th
 
 ## Uninstall
 
-For complete removal, use **LeftOpen → Settings → About → Uninstall LeftOpen…**.
-Direct `brew uninstall` only removes the app and CLI; services, certificates and
-settings may remain. If already removed, reinstall the app and use its uninstaller.
-See [complete uninstall](docs/uninstall.md).
+For complete removal, use **Ajar → Settings → About → Uninstall Ajar…**. Deleting
+the app alone leaves fixed-address services, certificates and settings behind; if it
+is already gone, rebuild the app and use its uninstaller. See [complete uninstall](docs/uninstall.md).
+
+## Migrating from LeftOpen
+
+Ajar uses its own identifiers (`io.github.boyongjiong.ajar.*`), so it runs alongside
+LeftOpen without touching LeftOpen's services, certificates or `/etc/hosts` entries.
+On first launch Ajar copies LeftOpen's preferences (language, appearance, hidden ports,
+refresh interval and similar); fixed addresses are set up again in Ajar. To remove
+LeftOpen's background service, use LeftOpen's own uninstaller before deleting it.
+
+## Credits
+
+Ajar is a fork of [LeftOpen](https://github.com/SonghaiFan/leftopen), created by
+[Songhai Fan](https://github.com/SonghaiFan) and released under the MIT License, which
+Ajar keeps. Fixed addresses are powered by [Portless](https://github.com/vercel-labs/portless) (Apache-2.0).

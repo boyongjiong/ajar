@@ -15,7 +15,7 @@ async function waitFor(check) {
   for (let i = 0; i < 120; i++) { const value = check(); if (value) return value; await delay(25); }
   throw new Error('Timed out');
 }
-async function engine(t, parentPID = process.pid, directory = fs.mkdtempSync(path.join(os.tmpdir(), 'leftopen-engine-test-'))) {
+async function engine(t, parentPID = process.pid, directory = fs.mkdtempSync(path.join(os.tmpdir(), 'ajar-engine-test-'))) {
   const child = spawn(process.execPath, [path.join(runtime, 'engine.mjs'), directory, String(parentPID)],
     { stdio: ['pipe', 'ignore', 'pipe'], env: { PATH: '/usr/bin:/bin' } });
   let error = ''; child.stderr.on('data', data => { error += data.toString(); });
@@ -56,7 +56,7 @@ async function blockedEngineState(t) {
       if (error.code === 'EADDRINUSE') continue;
       throw error;
     }
-    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'leftopen-engine-test-'));
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'ajar-engine-test-'));
     fs.writeFileSync(path.join(directory, 'port.json'), JSON.stringify(port));
     t.after(() => {
       if (blocker.listening) blocker.close();

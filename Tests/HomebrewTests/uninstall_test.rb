@@ -23,21 +23,21 @@ end
 class HomebrewUninstallTest < Minitest::Test
   def setup
     @cask = CaskFixture.new
-    @cask.instance_eval(File.read(File.expand_path("../../Resources/Homebrew/leftopen.rb", __dir__)))
+    @cask.instance_eval(File.read(File.expand_path("../../Resources/Homebrew/ajar.rb", __dir__)))
   end
 
   def test_package_manages_app_and_cli_without_cleanup_hooks
-    assert_equal "LeftOpen.app", @cask.application
-    assert_equal "/Applications/LeftOpen.app/Contents/MacOS/leftopen", @cask.cli
+    assert_equal "Ajar.app", @cask.application
+    assert_equal "/Applications/Ajar.app/Contents/MacOS/ajar", @cask.cli
   end
 
   def test_complete_removal_guidance_includes_recovery_after_package_removal
-    assert_includes @cask.guidance, "Settings > About > Uninstall LeftOpen"
+    assert_includes @cask.guidance, "Settings > About > Uninstall Ajar"
     assert_includes @cask.guidance, "settings may remain"
-    assert_includes @cask.guidance, "reinstall LeftOpen"
+    assert_includes @cask.guidance, "reinstall Ajar"
   end
 
   def test_zap_only_removes_saved_window_state
-    assert_equal({ trash: ["~/Library/Saved Application State/app.leftopen.mac.savedState"] }, @cask.zap_options)
+    assert_equal({ trash: ["~/Library/Saved Application State/io.github.boyongjiong.ajar.mac.savedState"] }, @cask.zap_options)
   end
 end

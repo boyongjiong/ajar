@@ -1,4 +1,4 @@
-# Release LeftOpen
+# Release Ajar
 
 After merging changes into `main`, open **Actions → Release → Run workflow**,
 keep the branch on `main`, and enter the new version (for example, `0.4.1`).
@@ -29,9 +29,9 @@ In **Settings → Secrets and variables → Actions**, add these repository secr
 | `APPLE_ID` | Apple account used for notarization. |
 | `APPLE_TEAM_ID` | Developer Team ID. |
 | `APPLE_APP_PASSWORD` | An Apple app-specific password for notarization. |
-| `HOMEBREW_TAP_TOKEN` | A fine-grained GitHub token for `SonghaiFan/homebrew-tap`, with **Contents: read and write** and permission to push to `main`. |
+| `HOMEBREW_TAP_TOKEN` | A fine-grained GitHub token for `boyongjiong/homebrew-tap`, with **Contents: read and write** and permission to push to `main`. |
 
-Use the existing Developer ID and bundle identifier (`app.leftopen.mac`). Keep
+Use the existing Developer ID and bundle identifier (`io.github.boyongjiong.ajar.mac`). Keep
 signing exports outside the repository; never paste credentials into source,
 logs, issues, or chat. GitHub supplies the release job's `GITHUB_TOKEN` automatically.
 The tap needs its own token because it is another repository.

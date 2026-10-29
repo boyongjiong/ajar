@@ -1,4 +1,4 @@
-// LeftOpen addition to the pinned Portless CLI: fail closed when native observations expire.
+// Ajar addition to the pinned Portless CLI: fail closed when native observations expire.
 import fs from 'node:fs';
 import path from 'node:path';
 export function gateRoutes(routes, directory, now = Date.now(), alive = pid => {
@@ -8,10 +8,10 @@ export function gateRoutes(routes, directory, now = Date.now(), alive = pid => {
   let managed;
   let leases;
   try {
-    managed = new Set(JSON.parse(fs.readFileSync(path.join(directory, 'leftopen-managed.json'), 'utf8')));
-    leases = JSON.parse(fs.readFileSync(path.join(directory, 'leftopen-leases.json'), 'utf8'));
+    managed = new Set(JSON.parse(fs.readFileSync(path.join(directory, 'ajar-managed.json'), 'utf8')));
+    leases = JSON.parse(fs.readFileSync(path.join(directory, 'ajar-leases.json'), 'utf8'));
   } catch {
-    // This is a private LeftOpen namespace. Missing observation files never permit stale forwarding.
+    // This is a private Ajar namespace. Missing observation files never permit stale forwarding.
     return [];
   }
   return routes.filter(route => {

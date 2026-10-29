@@ -1,16 +1,12 @@
 <div align="center">
-  <img src="assets/logo.svg" alt="LeftOpen Logo" width="48" height="80" />
-  <h1>LeftOpen</h1>
-  <p><strong>原生 macOS 菜单栏端口管理工具与 CLI</strong></p>
-  <p>把那些虚掩着的门，轻轻关上。</p>
-  <p><em>See what your tools left running on localhost, identify projects, and gently close them.</em></p>
+  <img src="assets/logo.svg" alt="Ajar Logo" width="48" height="80" />
+  <h1>Ajar</h1>
+  <p><strong>macOS 菜单栏本地端口管理器 &amp; 命令行工具</strong></p>
+  <p><em>看清每个本地端口属于哪个项目、是做什么用的，然后安全地关掉不再需要的服务。</em></p>
 
   <p>
-    <a href="https://leftopen.songhai.site/"><img src="https://img.shields.io/badge/website-songhai.site-211811?style=flat-square" alt="Website" /></a>
-    <a href="https://github.com/SonghaiFan/leftopen/releases/latest"><img src="https://img.shields.io/github/v/release/SonghaiFan/leftopen?color=black&style=flat-square" alt="Release" /></a>
-    <a href="https://github.com/SonghaiFan/homebrew-tap"><img src="https://img.shields.io/badge/homebrew-cask-211811?style=flat-square" alt="Homebrew Cask" /></a>
+    <a href="https://boyongjiong.github.io/ajar/"><img src="https://img.shields.io/badge/website-ajar-211811?style=flat-square" alt="Website" /></a>
     <img src="https://img.shields.io/badge/macOS-14.0%2B-555555?style=flat-square" alt="macOS 14+" />
-    <img src="https://img.shields.io/badge/Apple%20Notarized-Accepted-211811?style=flat-square" alt="Apple Notarized" />
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-555555?style=flat-square" alt="License: MIT" /></a>
   </p>
 
@@ -19,36 +15,36 @@
   <br />
   <picture>
     <source srcset="assets/preview-zh-dark.png" media="(prefers-color-scheme: dark)">
-    <img src="assets/preview-zh.png" alt="LeftOpen 菜单栏面板：可关闭的端口排在前面，系统服务与 app 折叠收起" width="375" />
+    <img src="assets/preview-zh.png" alt="Ajar 菜单栏面板：可关闭的端口排在前面，系统服务与 app 折叠收起" width="375" />
   </picture>
   <br /><br />
 </div>
 
-> 当我并行让多个 agent 写代码时，开发服务器和测试服务会不断启动，监听不同的端口。忙完一天，电脑里往往留下不少还开着的服务。
->
-> 现有工具要么太复杂，要么只能告诉你“端口被占用”，却说不清它到底属于哪个进程、可能来自哪个项目。
->
-> 所以我做了 **LeftOpen**。它安静地待在菜单栏里，帮你一眼看清正在监听的端口、对应的进程，以及可能关联的项目。确认之后，你可以关闭那些不再需要的服务。
->
-> *把那些虚掩着的门，轻轻关上。*
+并行让多个 coding agent 干活时，开发服务器、测试服务和构建守护进程会不断在不同端口上启动，忙完一天总有几个还开着。`lsof`、`kill-port` 只能告诉你“端口被占用”，说不清它属于哪个项目、是做什么的。
 
----
+**Ajar** 安静地待在菜单栏里，列出所有正在监听的端口、背后的进程和项目，以及每个端口的用途。把那些虚掩着的门，轻轻关上。
 
-> 这个项目正在快速迭代，并将永久免费开源。如果你已经下载或正在使用，欢迎 **Star** 收藏项目，并 [**Follow @SonghaiFan**](https://github.com/SonghaiFan) 关注后续项目动态。你的 Star 是对我最大的支持，也是我持续开发的最大动力。
+> Ajar fork 自 Songhai Fan 的 [LeftOpen](https://github.com/SonghaiFan/leftopen)，详见[致谢](#致谢)。
 
 ## 安装
 
-### Homebrew（推荐）
+Ajar 暂未发布安装包，请从源码构建。需要完整的 Xcode（仅有 Command Line Tools 不够），macOS Sonoma (14.0+)，支持 Apple Silicon 与 Intel。
 
 ```bash
-brew install --cask songhaifan/tap/leftopen
+git clone https://github.com/boyongjiong/ajar.git
+cd ajar
+python3 Scripts/dev-app.py run        # 构建并运行本地测试版
 ```
 
-支持运行 macOS Sonoma (14.0+) 的 Apple Silicon 和 Intel Mac。App 与附带的 CLI 均为通用二进制，由 Apple Developer ID 签名并经 Apple 公证。
+安装自己构建的版本：
 
-### 手动下载
+```bash
+AJAR_OUTPUT_DIR=dist/local zsh Scripts/build-app.sh
+cp -R dist/local/Ajar.app /Applications/
+ln -sf /Applications/Ajar.app/Contents/MacOS/ajar /opt/homebrew/bin/ajar   # 可选：命令行
+```
 
-前往 [GitHub Releases](https://github.com/SonghaiFan/leftopen/releases/latest) 下载 `LeftOpen-release.zip`，解压后将 `LeftOpen.app` 移至「应用程序」。
+本地构建使用 ad-hoc 签名，在自己的 Mac 上使用没有问题。如果下载依赖时报 `CERTIFICATE_VERIFY_FAILED`，请运行 python.org 版 Python 自带的 *Install Certificates*，或设置 `SSL_CERT_FILE=/etc/ssl/cert.pem`。
 
 ---
 
@@ -63,13 +59,15 @@ brew install --cask songhaifan/tap/leftopen
 - **外观。** 在 **设置 → 通用** 中选择跟随系统、浅色或深色，同页提供语言、登录启动与声音设置。**项目** 页显示本地地址服务的健康状态。
 - **默认安静。** 原生 SwiftUI `MenuBarExtra`。无 Dock 图标，无遥测；除非启用固定地址，否则没有后台服务。唯一离开这台 Mac 的网络请求是每天向 GitHub 查询一次最新版本，可在设置中关闭。
 - **固定项目地址。** 为开发服务器分配稳定的 `https://myapp.localhost`，端口变化后自动跟随，由内置的 [Portless](https://github.com/vercel-labs/portless) 提供。详见[下文](#固定项目地址)。
-- **终端里是同一个引擎。** App 附带 `leftopen` 命令行工具，推断和安全规则完全一致。
+- **说清每个端口的用途。** 一个进程有多个端口时，分别标出 Spring Actuator、应用服务器、网页（取页面标题）、JSON API，或不说 HTTP 的 TCP 端口；只对本机地址发两个有限制的请求。
+- **认出构建守护进程和隧道。** Gradle、Kotlin、Maven 守护进程和 sshuttle 显示为工具本身，而不是启动它们的项目目录；“全部关闭”不会动它们。
+- **终端里是同一个引擎。** App 附带 `ajar` 命令行工具，推断和安全规则完全一致。
 
 ---
 
 ## 固定项目地址
 
-开发服务器的端口会变，地址可以不变。LeftOpen 内置 [Portless](https://github.com/vercel-labs/portless) 0.15.7 和 Node 24.14.0，无需另外安装。
+开发服务器的端口会变，地址可以不变。Ajar 内置 [Portless](https://github.com/vercel-labs/portless) 0.15.7 和 Node 24.14.0，无需另外安装。
 
 1. **首次设置：** 开启 **设置 → 项目 → 固定地址**。macOS 会请求授权，用于信任本地 CA、在所选代理端口（默认 443）安装只监听本机的 HTTPS 服务，并管理精确的 `/etc/hosts` 条目。只有设置页的明确操作会请求授权；项目操作和后台扫描都不会。
 2. **每个项目：** 照常启动项目，在端口详情点击 **启用固定地址**，即可通过 `https://myapp.localhost` 访问。
@@ -78,19 +76,19 @@ brew install --cask songhaifan/tap/leftopen
 
 - **确认后才转发。** 跟随端口变化前，核对项目目录、可执行文件、工作目录、参数摘要和当前监听进程。归属不明确或无关的监听者、仅 HTTPS 的上游和非 Web 端口不会被转发。开发服务器拒绝新主机名时在详情中显示原因，不修改项目文件。
 - **启动已停止的项目。** 已保存但未运行的项目有开发脚本时显示 **启动**，使用 Portless 自身的启动器（分配空闲端口、适配框架参数、区分 worktree）。没有开发脚本的项目可在 `.claude/launch.json` 中声明启动命令（`runtimeExecutable`、`runtimeArgs`、`port`），仅在你点击 **启动** 时通过 `portless run` 运行，不经过 shell。`portless.json` 和 `package.json` 的 `"portless"` 字段由 Portless 自身读取。不从进程参数猜启动命令；两者都没有的项目可右键快捷方式选择 **复制给 AI 的设置提示词**，粘贴给编程 agent 来创建 `.claude/launch.json`。
-- **短期租约，而非永久规则。** 扫描到的服务使用短期映射，LeftOpen 停止扫描后失效，下次打开时恢复。停用地址不会停止项目。HTTPS 服务在退出 App 后仍保留；443 已被占用时显示原因，不抢占。
-- **供 Agent 与脚本使用：** `leftopen url [名称|端口|路径]` 输出已确认的地址（加 `--json` 获取结构化结果），`leftopen --json` 为对应服务增加 `fixedURL`。
+- **短期租约，而非永久规则。** 扫描到的服务使用短期映射，Ajar 停止扫描后失效，下次打开时恢复。停用地址不会停止项目。HTTPS 服务在退出 App 后仍保留；443 已被占用时显示原因，不抢占。
+- **供 Agent 与脚本使用：** `ajar url [名称|端口|路径]` 输出已确认的地址（加 `--json` 获取结构化结果），`ajar --json` 为对应服务增加 `fixedURL`。
 
 已有的 HTTP 地址继续可用，可在同一设置页完成 HTTPS 升级。Portless（Apache-2.0）与 Node 随附各自的许可证。
 
-**固定地址设置：** 在「设置 → 项目」一行开启或关闭固定地址，无需手动配置端口。首次设置优先使用 443；冲突时在同一次授权中尝试 8443–8462，成功后记住端口，打开和复制的地址会自动带上它。不会终止其他占用者；无法安全安装时保留错误和可复制诊断。通过 LeftOpen 启动的项目运行时不自动迁移端口。关闭固定地址会撤下路由，保留绑定、证书和代理，不关闭项目服务器；通过 LeftOpen 启动的项目需先停止。
+**固定地址设置：** 在「设置 → 项目」一行开启或关闭固定地址，无需手动配置端口。首次设置优先使用 443；冲突时在同一次授权中尝试 8443–8462，成功后记住端口，打开和复制的地址会自动带上它。不会终止其他占用者；无法安全安装时保留错误和可复制诊断。通过 Ajar 启动的项目运行时不自动迁移端口。关闭固定地址会撤下路由，保留绑定、证书和代理，不关闭项目服务器；通过 Ajar 启动的项目需先停止。
 
 ---
 
-## 为什么选择 LeftOpen？（解决的核心痛点）
+## 为什么选择 Ajar？（解决的核心痛点）
 
-- **解决端口被占用问题（`EADDRINUSE` / Port in use）**：开发服务启动失败提示端口 3000、5173 或 8080 被占用时，LeftOpen 让你在菜单栏或终端快速定位残留进程并一键关闭，无需重启终端或 Mac。
-- **定位真实项目，告别模糊的 `node` / `python` PID**：`lsof -i` 和普通端口清理脚本只能提供裸 PID 或进程名。LeftOpen 自动向上追溯工作目录（识别 `package.json`、`Cargo.toml`、`pyproject.toml`、`go.mod`、`.git` 等），显示真实项目名称与应用图标。
+- **解决端口被占用问题（`EADDRINUSE` / Port in use）**：开发服务启动失败提示端口 3000、5173 或 8080 被占用时，Ajar 让你在菜单栏或终端快速定位残留进程并一键关闭，无需重启终端或 Mac。
+- **定位真实项目，告别模糊的 `node` / `python` PID**：`lsof -i` 和普通端口清理脚本只能提供裸 PID 或进程名。Ajar 自动向上追溯工作目录（识别 `package.json`、`Cargo.toml`、`pyproject.toml`、`go.mod`、`.git` 等），显示真实项目名称与应用图标。
 - **发现意外的局域网暴露（LAN Exposure）**：清晰区分仅本机可见（`127.0.0.1`）与暴露在局域网（`0.0.0.0` / 网卡 IP）的服务，防止本地开发或测试数据库在公共 Wi-Fi 中无意公开。
 - **先给进程正常退出的机会**：优先发送 `SIGTERM`，让服务运行清理钩子与保存状态；仍未停止时，再次点击或右滑关闭会强制结束，同时重新核验 PID、启动时间和受影响端口。
 
@@ -101,28 +99,28 @@ brew install --cask songhaifan/tap/leftopen
 安装后即可在终端直接运行：
 
 ```bash
-# 查看所有监听端口与归属（或 leftopen list）
-leftopen
+# 查看所有监听端口与归属（或 ajar list）
+ajar
 
 # 查看指定端口详情
-leftopen 3000
+ajar 3000
 
 # 在默认浏览器打开 http://localhost:3000
-leftopen open 3000
+ajar open 3000
 
 # 输出项目已确认的固定地址（如 https://myapp.localhost）
-leftopen url myapp
+ajar url myapp
 
 # 安全关闭指定端口（SIGTERM，先确认）
-leftopen close 3000
+ajar close 3000
 
 # 结构化 JSON 输出
-leftopen --json
+ajar --json
 ```
 
 输出示例：
 ```text
-LEFT OPEN
+AJAR
 26 listening ports · 17 processes · 1 projects · 8 LAN-visible
 
 MY PROJECTS (2)
@@ -162,7 +160,7 @@ python3 Scripts/dev-app.py run
 python3 Scripts/dev-app.py clean
 ```
 
-本地构建名为 **LeftOpen Test**，使用独立 bundle ID，不会安装到 `/Applications`。清理只处理脚本管理的输出目录，发现 App 或内置进程仍在运行时会拒绝删除，请先退出测试版。固定地址服务和其他用户数据不会被重置。CI 与正式打包继续显式指定 `LEFTOPEN_OUTPUT_DIR`；日常测试请勿再生成多个 `dist/` 版本目录。
+本地构建名为 **Ajar Test**，使用独立 bundle ID，不会安装到 `/Applications`。清理只处理脚本管理的输出目录，发现 App 或内置进程仍在运行时会拒绝删除，请先退出测试版。固定地址服务和其他用户数据不会被重置。CI 与正式打包继续显式指定 `AJAR_OUTPUT_DIR`；日常测试请勿再生成多个 `dist/` 版本目录。
 
 ---
 
@@ -172,7 +170,16 @@ python3 Scripts/dev-app.py clean
 
 ## 卸载
 
-完整卸载请使用 **LeftOpen → 设置 → 关于 → 卸载 LeftOpen…**。
-直接运行 `brew uninstall` 只移除应用和 CLI，可能留下后台服务、证书和配置。
-如果已删除应用，请重新安装后使用应用内卸载功能。
-详见[完整卸载说明](docs/uninstall.md)。
+完整卸载请使用 **Ajar → 设置 → 关于 → 卸载 Ajar…**。只删除 App 会留下固定地址服务、证书和配置；
+如果已删除，请重新构建后使用应用内卸载功能。详见[完整卸载说明](docs/uninstall.md)。
+
+## 从 LeftOpen 迁移
+
+Ajar 使用自己的标识（`io.github.boyongjiong.ajar.*`），可以和 LeftOpen 同时存在，不会碰 LeftOpen
+的服务、证书和 `/etc/hosts` 条目。首次启动时，Ajar 会导入 LeftOpen 的偏好设置（语言、外观、隐藏端口、
+刷新间隔等）；固定地址需要在 Ajar 中重新设置。要移除 LeftOpen 的后台服务，请在删除前使用 LeftOpen 自己的卸载功能。
+
+## 致谢
+
+Ajar fork 自 [Songhai Fan](https://github.com/SonghaiFan) 创建的 [LeftOpen](https://github.com/SonghaiFan/leftopen)，
+沿用其 MIT 许可证。固定地址功能由 [Portless](https://github.com/vercel-labs/portless)（Apache-2.0）提供。

@@ -17,7 +17,7 @@ on:
         default: '1'
 
 concurrency:
-  group: leftopen-release
+  group: ajar-release
   cancel-in-progress: false
 
 permissions:
@@ -62,8 +62,8 @@ jobs:
       BETA_NUMBER: ${{ inputs.beta_number }}
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
-      LEFTOPEN_BUNDLE_ID: app.leftopen.mac
-      LEFTOPEN_NOTARY_PROFILE: leftopen-ci
+      AJAR_BUNDLE_ID: io.github.boyongjiong.ajar.mac
+      AJAR_NOTARY_PROFILE: ajar-ci
     steps:
       - uses: actions/checkout@v6
         with:
@@ -72,9 +72,9 @@ jobs:
 
       - name: Set temporary paths
         run: |
-          echo "LEFTOPEN_OUTPUT_DIR=$RUNNER_TEMP/leftopen-release" >> "$GITHUB_ENV"
-          echo "SIGNING_KEYCHAIN=$RUNNER_TEMP/leftopen-signing.keychain-db" >> "$GITHUB_ENV"
-          echo "LEFTOPEN_NOTARY_KEYCHAIN=$RUNNER_TEMP/leftopen-signing.keychain-db" >> "$GITHUB_ENV"
+          echo "AJAR_OUTPUT_DIR=$RUNNER_TEMP/ajar-release" >> "$GITHUB_ENV"
+          echo "SIGNING_KEYCHAIN=$RUNNER_TEMP/ajar-signing.keychain-db" >> "$GITHUB_ENV"
+          echo "AJAR_NOTARY_KEYCHAIN=$RUNNER_TEMP/ajar-signing.keychain-db" >> "$GITHUB_ENV"
 
       - name: Check release credentials
         env:
@@ -134,26 +134,26 @@ jobs:
           security create-keychain -p "$keychain_password" "$SIGNING_KEYCHAIN"
           security set-keychain-settings -lut 3600 "$SIGNING_KEYCHAIN"
           security unlock-keychain -p "$keychain_password" "$SIGNING_KEYCHAIN"
-          certificate_path="$RUNNER_TEMP/leftopen-signing.p12"
+          certificate_path="$RUNNER_TEMP/ajar-signing.p12"
           printf '%s' "$CERTIFICATE" | base64 --decode > "$certificate_path"
           security import "$certificate_path" -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$SIGNING_KEYCHAIN"
           security set-key-partition-list -S apple-tool:,apple: -k "$keychain_password" "$SIGNING_KEYCHAIN"
           security list-keychains -d user -s "$SIGNING_KEYCHAIN"
-          xcrun notarytool store-credentials "$LEFTOPEN_NOTARY_PROFILE" \
+          xcrun notarytool store-credentials "$AJAR_NOTARY_PROFILE" \
             --keychain "$SIGNING_KEYCHAIN" \
             --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD"
 
       - name: Sign, notarize, and verify
         env:
-          LEFTOPEN_APP_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          AJAR_APP_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
         run: Scripts/sign-and-notarize.sh
 
       - name: Verify final archive
         id: archive
         run: |
-          cd "$LEFTOPEN_OUTPUT_DIR"
-          ditto -x -k LeftOpen-release.zip verified
-          app="$LEFTOPEN_OUTPUT_DIR/verified/LeftOpen.app"
+          cd "$AJAR_OUTPUT_DIR"
+          ditto -x -k Ajar-release.zip verified
+          app="$AJAR_OUTPUT_DIR/verified/Ajar.app"
           "$GITHUB_WORKSPACE/Scripts/verify-universal-app.sh" "$app"
           swift "$GITHUB_WORKSPACE/Scripts/legacy-app-icon.swift" verify "$GITHUB_WORKSPACE/Resources/AppIcon.icns" "$app"
           codesign --verify --deep --strict --all-architectures "$app"
@@ -161,8 +161,8 @@ jobs:
           xcrun stapler validate "$app"
           spctl --assess --type execute "$app"
           [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")" == "$VERSION" ]]
-          [[ "$("$app/Contents/MacOS/leftopen" --version)" == "LeftOpen $VERSION" ]]
-          shasum -a 256 LeftOpen-release.zip > SHA256SUMS
+          [[ "$("$app/Contents/MacOS/ajar" --version)" == "Ajar $VERSION" ]]
+          shasum -a 256 Ajar-release.zip > SHA256SUMS
           echo "sha256=$(cut -d ' ' -f 1 SHA256SUMS)" >> "$GITHUB_OUTPUT"
 
       - name: Publish verified release
@@ -181,12 +181,12 @@ jobs:
               channel_args=(--prerelease --latest=false)
             fi
             gh release create "$tag" --target "$GITHUB_SHA" --draft \
-              --title "LeftOpen $tag" --generate-notes "${channel_args[@]}"
+              --title "Ajar $tag" --generate-notes "${channel_args[@]}"
           else
             target="$(gh release view "$tag" --json targetCommitish --jq .targetCommitish)"
             [[ "$target" == "$GITHUB_SHA" ]] || { echo '::error::Draft belongs to another commit.'; exit 1; }
           fi
-          gh release upload "$tag" "$LEFTOPEN_OUTPUT_DIR/LeftOpen-release.zip" "$LEFTOPEN_OUTPUT_DIR/SHA256SUMS" --clobber
+          gh release upload "$tag" "$AJAR_OUTPUT_DIR/Ajar-release.zip" "$AJAR_OUTPUT_DIR/SHA256SUMS" --clobber
           if [[ "$PRERELEASE" == true ]]; then
             gh release edit "$tag" --draft=false --prerelease --latest=false
           else
@@ -200,7 +200,7 @@ jobs:
           if [[ -f "$SIGNING_KEYCHAIN" ]]; then
             security delete-keychain "$SIGNING_KEYCHAIN"
           fi
-          rm -f "$RUNNER_TEMP/leftopen-signing.p12"
+          rm -f "$RUNNER_TEMP/ajar-signing.p12"
 
   homebrew:
     needs: release
@@ -213,7 +213,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          repository: SonghaiFan/homebrew-tap
+          repository: boyongjiong/homebrew-tap
           ref: main
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
 
@@ -222,7 +222,7 @@ jobs:
         with:
           repository: ${{ github.repository }}
           ref: ${{ github.sha }}
-          path: .leftopen-release-source
+          path: .ajar-release-source
           persist-credentials: false
 
       - name: Update cask
@@ -231,7 +231,7 @@ jobs:
           import os
           import re
           from pathlib import Path
-          path = Path('Casks/leftopen.rb')
+          path = Path('Casks/ajar.rb')
           source = path.read_text()
           current = re.search(r'(?m)^  version "([0-9]+\.[0-9]+\.[0-9]+)"$', source)
           if current is None:
@@ -241,22 +241,22 @@ jobs:
               raise SystemExit('Refusing to downgrade a newer Homebrew release')
           if not re.fullmatch(r'[0-9a-f]{64}', os.environ['SHA256']):
               raise SystemExit('Missing or invalid release checksum')
-          source = Path('.leftopen-release-source/Resources/Homebrew/leftopen.rb').read_text()
+          source = Path('.ajar-release-source/Resources/Homebrew/ajar.rb').read_text()
           for name, value in [('version', os.environ['VERSION']), ('sha256', os.environ['SHA256'])]:
               source, count = re.subn(rf'(?m)^(  {name} )"[^"]+"$', lambda m: f'{m[1]}"{value}"', source)
               if count != 1:
                   raise SystemExit(f'Expected exactly one {name} field')
           path.write_text(source)
           PY
-          ruby -c Casks/leftopen.rb
+          ruby -c Casks/ajar.rb
           git diff --check
-          if git diff --quiet -- Casks/leftopen.rb; then
+          if git diff --quiet -- Casks/ajar.rb; then
             echo 'Homebrew is already current.' >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add Casks/leftopen.rb
-          git commit -m "Update LeftOpen to $VERSION"
+          git add Casks/ajar.rb
+          git commit -m "Update Ajar to $VERSION"
           git push origin HEAD:main
           echo "Homebrew updated to $VERSION." >> "$GITHUB_STEP_SUMMARY"

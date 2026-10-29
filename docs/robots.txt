@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://leftopen.songhai.site/sitemap.xml
+Sitemap: https://boyongjiong.github.io/ajar/sitemap.xml

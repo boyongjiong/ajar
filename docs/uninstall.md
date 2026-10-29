@@ -1,13 +1,13 @@
 # Complete uninstall
 
-In LeftOpen, open **Settings → About → Uninstall LeftOpen…**. Confirm once and
+In Ajar, open **Settings → About → Uninstall Ajar…**. Confirm once and
 complete any macOS authorization prompts. The action removes the login item,
-the LeftOpen address daemon and its runtime, the exact local CA from the current
-user's keychains and the system keychain, LeftOpen hosts entries, saved addresses,
+the Ajar address daemon and its runtime, the exact local CA from the current
+user's keychains and the system keychain, Ajar hosts entries, saved addresses,
 settings and caches. Project files and unrelated Portless installations remain.
 
 Downloaded apps are moved to Trash after cleanup succeeds. For Homebrew installs,
-LeftOpen runs `brew uninstall --cask --zap songhaifan/tap/leftopen` after cleanup,
+Ajar runs `brew uninstall --cask --zap boyongjiong/tap/ajar` after cleanup,
 with dependency autoremove disabled, so Homebrew removes the CLI link and its
 Caskroom record. This requires the installed app and bundled runtime; development
 executables cannot uninstall a production app.
@@ -17,21 +17,21 @@ Some earlier steps (such as login item or user certificate removal) may already
 have completed. A retry accepts missing entries but fails on inaccessible keychains,
 unexpected service ownership, symlinks, or edited hosts blocks. Unreadable or unsafe
 CA files still stop cleanup. A missing CA does not block removal of a verified
-LeftOpen daemon and files, but NO keychain entry is deleted in that case. Native
+Ajar daemon and files, but NO keychain entry is deleted in that case. Native
 uninstall shows a warning before app removal; Homebrew prints a warning. Neither
 path claims that unidentified certificates were removed.
 
 If the original CA file was deleted, recreating a new CA cannot identify the old
 keychain entry. That orphan needs manual review; the uninstaller reports the
 problem rather than claiming it removed an unidentified certificate. Projects
-started through LeftOpen must be stopped before uninstalling so their wrappers
+started through Ajar must be stopped before uninstalling so their wrappers
 cannot recreate the deleted address state.
 
 ## Interrupted-install recovery (0.5.5)
 
 Setup and uninstall validate the root-owned plist, the loaded launchd job's full
 arguments and user-state path, and its actual root process executable. A missing
-`proxy.pid`, runtime directory or CA no longer prevents recognition of LeftOpen's
+`proxy.pid`, runtime directory or CA no longer prevents recognition of Ajar's
 own running service. Setup also requires every HTTPS listener to belong to that
 verified PID before stopping it; it never kills a PID from user state. The job is
 rechecked immediately before bootout. Unknown or changed identities fail closed.
@@ -71,7 +71,7 @@ preferences, command-launch and app-removal failures have separate stages.
 
 ## Distribution boundary
 
-Complete cleanup belongs to the app's **Settings → About → Uninstall LeftOpen…**
+Complete cleanup belongs to the app's **Settings → About → Uninstall Ajar…**
 action. Homebrew manages the app bundle, CLI link and package receipt; it does not
 run the cleaner during uninstall, upgrade or reinstall. Direct `brew uninstall`
 (including `--zap`) may leave the background address service, certificates, saved
@@ -79,18 +79,18 @@ addresses and settings. `--zap` only additionally removes saved window state.
 If you already removed the app, reinstall it and use its Uninstall action to finish
 cleanup. Dragging the app to Trash does not invoke the cleaner either.
 
-Quit projects launched through LeftOpen before using the app's uninstaller.
+Quit projects launched through Ajar before using the app's uninstaller.
 Authorization cancellation or cleanup failure stops package removal and leaves
 the app available for retry. Do not use `sudo brew`.
 
 Older Homebrew installation receipts can still contain the former cleanup hook.
 The app retains its cleanup-only entry point and private child-process
-`LEFTOPEN_UNINSTALL_CLEANED=1` handoff for compatibility with those receipts.
+`AJAR_UNINSTALL_CLEANED=1` handoff for compatibility with those receipts.
 Do not set this flag in your shell. New casks have no uninstall flight block.
 Homebrew uses metadata saved at installation time, so updating the tap alone does
 not remove the old hook from an existing receipt. After the updated cask is
 published, an upgrade or reinstall refreshes that receipt without cleaning user
-state. The cask is generated from `Resources/Homebrew/leftopen.rb` with the release
+state. The cask is generated from `Resources/Homebrew/ajar.rb` with the release
 version and checksum.
 
 ## Validation
@@ -111,7 +111,7 @@ It also covers delayed unregister, nonzero bootout followed by confirmed absence
 pending shutdown and failed verification. `FailureDiagnosticsTests` covers
 redaction, malformed records, numeric errors, signal classification and size limits.
 Run `zsh Tests/DiagnosticsUITests/run.sh` for the standalone native disclosure/copy
-fixture. It uses a private pasteboard and does not start LeftOpen's services.
+fixture. It uses a private pasteboard and does not start Ajar's services.
 `LoginItemCleanupTests` exercises absence, repeated cleanup, registration races,
 authorization/signature failures, domain matching and final-state verification
 using injected operations. A native status-only test checks an unregistered test

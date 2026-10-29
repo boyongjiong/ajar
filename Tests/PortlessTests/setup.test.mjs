@@ -8,11 +8,11 @@ import { noLinks, repairUserDirectories, installAddressService, checkedSetupResu
 
 const uid = process.getuid(), gid = process.getgid();
 function fixture(t) {
-  const home = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'leftopen-setup-test-'));
+  const home = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ajar-setup-test-'));
   fs.mkdirSync(path.join(home, 'Library/Application Support'), { recursive: true, mode: 0o755 });
   t.after(() => fs.rmSync(home, { recursive: true, force: true }));
-  return { home, parent: path.join(home, 'Library/Application Support/LeftOpen'),
-    directory: path.join(home, 'Library/Application Support/LeftOpen/Portless') };
+  return { home, parent: path.join(home, 'Library/Application Support/Ajar'),
+    directory: path.join(home, 'Library/Application Support/Ajar/Portless') };
 }
 const mode = file => fs.statSync(file).mode & 0o777;
 
@@ -53,7 +53,7 @@ test('root-owned parent repair targets only two directory descriptors, never des
 test('reject links, including dangling ones, before changing directories', t => {
   const {home, parent, directory} = fixture(t);
   fs.mkdirSync(directory, {recursive: true, mode: 0o755});
-  fs.symlinkSync('/nonexistent-leftopen-test-target', path.join(directory, 'ca.pem'));
+  fs.symlinkSync('/nonexistent-ajar-test-target', path.join(directory, 'ca.pem'));
   assert.throws(() => repairUserDirectories(home, uid, gid), /unsafePath/);
   assert.equal(mode(parent), 0o755);
   assert.throws(() => noLinks(path.join(directory, 'ca.pem')), /unsafePath/);
@@ -88,7 +88,7 @@ test('disabled service is enabled before upstream install, and failures stop ins
     assert.equal(disabled, false, 'bootstrap must be possible before install');
     return {status: 0};
   });
-  assert.deepEqual(calls[0], ['/bin/launchctl', ['enable', 'system/app.leftopen.portless.proxy']]);
+  assert.deepEqual(calls[0], ['/bin/launchctl', ['enable', 'system/io.github.boyongjiong.ajar.portless.proxy']]);
   assert.equal(calls.length, 2);
   let count = 0;
   assert.throws(() => installAddressService('/node', '/cli', '/state', {}, () => {
@@ -105,9 +105,9 @@ test('setup errors expose a bounded stage and exit code, never raw stderr', () =
 });
 
 test('macOS launchd disabled bootstrap recovers using enable first (isolated user agent)',
-  {skip: process.platform !== 'darwin' || process.env.LEFTOPEN_TEST_LAUNCHD !== '1'}, t => {
+  {skip: process.platform !== 'darwin' || process.env.AJAR_TEST_LAUNCHD !== '1'}, t => {
     const {home} = fixture(t);
-    const label = `app.leftopen.test.${process.pid}.${Date.now()}`;
+    const label = `io.github.boyongjiong.ajar.test.${process.pid}.${Date.now()}`;
     const domain = `gui/${uid}`, target = `${domain}/${label}`, plist = path.join(home, 'agent.plist');
     fs.writeFileSync(plist, `<?xml version="1.0"?><plist version="1.0"><dict><key>Label</key><string>${label}</string><key>ProgramArguments</key><array><string>/usr/bin/true</string></array></dict></plist>`);
     const launch = args => spawnSync('/bin/launchctl', args, {encoding:'utf8', timeout:10000});
@@ -116,7 +116,7 @@ test('macOS launchd disabled bootstrap recovers using enable first (isolated use
     assert.notEqual(launch(['bootstrap', domain, plist]).status, 0);
     installAddressService('/test-node', '/cli', '/state', {}, (command, args) => {
       if (command === '/bin/launchctl') {
-        assert.deepEqual(args, ['enable', 'system/app.leftopen.portless.proxy']);
+        assert.deepEqual(args, ['enable', 'system/io.github.boyongjiong.ajar.portless.proxy']);
         return launch(['enable', target]);
       }
       return launch(['bootstrap', domain, plist]);

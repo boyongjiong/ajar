@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LeftOpen — macOS Menu Bar Port Manager &amp; CLI | See &amp; Close Localhost Ports</title>
-  <meta name="description" content="LeftOpen is a native macOS menu bar app and CLI to see what is listening on localhost, identify projects and processes, check LAN exposure, and close ports safely.">
+  <title>Ajar — Localhost Port Manager for the macOS Menu Bar &amp; CLI</title>
+  <meta name="description" content="Ajar is a native macOS menu bar app and CLI to see what is listening on localhost, identify projects and processes, check LAN exposure, and close ports safely.">
   <meta name="keywords" content="macos port manager, kill port mac, localhost ports, port 3000 already in use, find process using port mac, lsof alternative, see listening ports, swiftui menubar, mac developer tools, stop dev server, kill-port mac, close port macos">
   <meta name="author" content="Songhai Fan">
   <meta name="robots" content="index, follow">
   <meta name="google-site-verification" content="FbfBzSC4xzDvWFqtE0uLoo5Rh8HMohAQa3kdJL9IQ8Y">
-  <link rel="canonical" href="https://leftopen.songhai.site/">
+  <link rel="canonical" href="https://boyongjiong.github.io/ajar/">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="apple-touch-icon" href="assets/AppIcon.png">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
@@ -17,23 +17,23 @@
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://leftopen.songhai.site/">
-  <meta property="og:site_name" content="LeftOpen">
-  <meta property="og:title" content="LeftOpen — macOS Menu Bar Port Manager &amp; CLI">
+  <meta property="og:url" content="https://boyongjiong.github.io/ajar/">
+  <meta property="og:site_name" content="Ajar">
+  <meta property="og:title" content="Ajar — macOS Menu Bar Port Manager &amp; CLI">
   <meta property="og:description" content="See what is listening on localhost, identify owning projects and processes, check LAN exposure, and close ports safely.">
-  <meta property="og:image" content="https://leftopen.songhai.site/assets/preview.png">
+  <meta property="og:image" content="https://boyongjiong.github.io/ajar/assets/preview.png">
   <meta property="og:image:width" content="750">
   <meta property="og:image:height" content="920">
-  <meta property="og:image:alt" content="LeftOpen macOS menu bar panel showing listening ports and owners">
+  <meta property="og:image:alt" content="Ajar macOS menu bar panel showing listening ports and owners">
   <meta property="og:locale" content="en_US">
   <meta property="og:locale:alternate" content="zh_CN">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://leftopen.songhai.site/">
-  <meta name="twitter:title" content="LeftOpen — macOS Menu Bar Port Manager &amp; CLI">
+  <meta name="twitter:url" content="https://boyongjiong.github.io/ajar/">
+  <meta name="twitter:title" content="Ajar — macOS Menu Bar Port Manager &amp; CLI">
   <meta name="twitter:description" content="See what is listening on localhost, identify projects and processes, and gently close them.">
-  <meta name="twitter:image" content="https://leftopen.songhai.site/assets/preview.png">
+  <meta name="twitter:image" content="https://boyongjiong.github.io/ajar/assets/preview.png">
 
   <!-- Structured Data (Schema.org JSON-LD) -->
   <script type="application/ld+json">
@@ -42,21 +42,21 @@
     "@graph": [
       {
         "@type": "WebSite",
-        "@id": "https://leftopen.songhai.site/#website",
-        "url": "https://leftopen.songhai.site/",
-        "name": "LeftOpen",
+        "@id": "https://boyongjiong.github.io/ajar/#website",
+        "url": "https://boyongjiong.github.io/ajar/",
+        "name": "Ajar",
         "description": "Native macOS menu bar app and CLI to see what is listening on localhost, identify projects and processes, and gently close them.",
         "inLanguage": ["en", "zh-CN"]
       },
       {
         "@type": "SoftwareApplication",
-        "@id": "https://leftopen.songhai.site/#software",
-        "name": "LeftOpen",
+        "@id": "https://boyongjiong.github.io/ajar/#software",
+        "name": "Ajar",
         "operatingSystem": "macOS 14.0+",
         "applicationCategory": "DeveloperApplication",
-        "url": "https://leftopen.songhai.site/",
-        "downloadUrl": "https://github.com/SonghaiFan/leftopen/releases/latest",
-        "image": "https://leftopen.songhai.site/assets/preview.png",
+        "url": "https://boyongjiong.github.io/ajar/",
+        "downloadUrl": "https://github.com/boyongjiong/ajar/releases/latest",
+        "image": "https://boyongjiong.github.io/ajar/assets/preview.png",
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -71,27 +71,27 @@
       },
       {
         "@type": "FAQPage",
-        "@id": "https://leftopen.songhai.site/#faq",
+        "@id": "https://boyongjiong.github.io/ajar/#faq",
         "mainEntity": [
           {
             "@type": "Question",
             "name": "How do I fix 'Port already in use' (EADDRINUSE) on Mac?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Open LeftOpen in your macOS menu bar or run 'leftopen 3000' in your terminal. LeftOpen identifies the exact project or process occupying the port and lets you close it gently with SIGTERM."
+              "text": "Open Ajar in your macOS menu bar or run 'ajar 3000' in your terminal. Ajar identifies the exact project or process occupying the port and lets you close it gently with SIGTERM."
             }
           },
           {
             "@type": "Question",
-            "name": "Why use LeftOpen instead of lsof -i or kill -9?",
+            "name": "Why use Ajar instead of lsof -i or kill -9?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "lsof -i only shows raw PIDs and generic names like node or python without project context. kill -9 causes hard termination without cleanup. LeftOpen walks up the directory tree to identify the project and sends a safe SIGTERM."
+              "text": "lsof -i only shows raw PIDs and generic names like node or python without project context. kill -9 causes hard termination without cleanup. Ajar walks up the directory tree to identify the project and sends a safe SIGTERM."
             }
           },
           {
             "@type": "Question",
-            "name": "What does LAN-visible mean in LeftOpen?",
+            "name": "What does LAN-visible mean in Ajar?",
             "acceptedAnswer": {
               "@type": "Answer",
               "text": "LOCAL means bound only to 127.0.0.1. LAN means the port is bound to 0.0.0.0 or a network interface, allowing other devices on the same Wi-Fi network to access it."
@@ -99,10 +99,10 @@
           },
           {
             "@type": "Question",
-            "name": "How to install LeftOpen on macOS?",
+            "name": "How to install Ajar on macOS?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Install LeftOpen via Homebrew by running 'brew install --cask songhaifan/tap/leftopen' or download the notarized universal binary from GitHub Releases."
+              "text": "Ajar has no published release yet. Clone https://github.com/boyongjiong/ajar and run 'python3 Scripts/dev-app.py run' with Xcode installed."
             }
           }
         ]
@@ -113,7 +113,7 @@
   <script>
     (function () {
       var saved;
-      try { saved = localStorage.getItem('leftopen-lang'); } catch (e) {}
+      try { saved = localStorage.getItem('ajar-lang'); } catch (e) {}
       var lang = saved === 'zh' ? 'zh' : 'en';
       document.documentElement.setAttribute('data-lang', lang);
       document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en');
@@ -713,9 +713,9 @@
 <body>
   <div class="wrap">
     <header class="top">
-      <a class="brand" href="#top"><img src="assets/logo.svg" alt="">LeftOpen</a>
+      <a class="brand" href="#top"><img src="assets/logo.svg" alt="">Ajar</a>
       <nav class="nav" aria-label="Primary navigation">
-        <a href="#cli">CLI</a><a href="#faq">FAQ</a><a class="release" href="https://github.com/SonghaiFan/leftopen/releases/latest">Releases</a><a href="https://github.com/SonghaiFan/leftopen">GitHub</a>
+        <a href="#cli">CLI</a><a href="#faq">FAQ</a><a class="release" href="https://github.com/boyongjiong/ajar/releases/latest">Releases</a><a href="https://github.com/boyongjiong/ajar">GitHub</a>
         <button class="lang-toggle" id="lang" type="button" aria-label="Switch language"><span lang="zh">EN</span><span lang="en">中文</span></button>
       </nav>
     </header>
@@ -725,17 +725,17 @@
           <p class="hero-tag" lang="zh">macOS 菜单栏端口管理与命令行工具</p>
           <p class="hero-tag" lang="en">macOS Menu Bar Port Manager &amp; CLI</p>
           <h1 lang="zh">把虚掩着的门<br>轻轻关上。</h1><h1 lang="en">Gently close the doors<br>left ajar.</h1>
-          <p class="intro" lang="zh">LeftOpen 在菜单栏里告诉你 localhost 上的端口、进程和可能关联的项目。</p>
-          <p class="intro" lang="en">LeftOpen shows the ports, processes and likely projects still listening on localhost.</p>
-          <div class="install"><code><span class="prompt">$ </span>brew install --cask songhaifan/tap/leftopen</code><button id="copy" type="button" aria-label="Copy install command"><span lang="zh">复制</span><span lang="en">Copy</span></button></div>
-          <p class="alternate" lang="zh">也可从 <a href="https://github.com/SonghaiFan/leftopen/releases/latest">GitHub Releases</a> 下载。</p>
-          <p class="alternate" lang="en">Or download it from <a href="https://github.com/SonghaiFan/leftopen/releases/latest">GitHub Releases</a>.</p>
+          <p class="intro" lang="zh">Ajar 在菜单栏里告诉你 localhost 上的端口、背后的进程和项目，以及每个端口是做什么的。</p>
+          <p class="intro" lang="en">Ajar shows every port listening on localhost, the process and project behind it, and what each port is for.</p>
+          <div class="install"><code><span class="prompt">$ </span>git clone https://github.com/boyongjiong/ajar.git</code><button id="copy" type="button" aria-label="Copy clone command"><span lang="zh">复制</span><span lang="en">Copy</span></button></div>
+          <p class="alternate" lang="zh">暂未发布安装包：克隆后运行 <code>python3 Scripts/dev-app.py run</code>，详见 <a href="https://github.com/boyongjiong/ajar#installation">README</a>。</p>
+          <p class="alternate" lang="en">No release yet: clone, then run <code>python3 Scripts/dev-app.py run</code>. See the <a href="https://github.com/boyongjiong/ajar#installation">README</a>.</p>
           <p class="alternate" lang="zh">支持 Apple Silicon 和 Intel Mac · macOS 14+</p>
           <p class="alternate" lang="en">Apple Silicon and Intel Macs · macOS 14+</p>
         </div>
         <figure class="shot">
-          <picture lang="en"><source srcset="assets/preview-dark.png" media="(prefers-color-scheme: dark)"><img src="assets/preview.png" width="375" height="460" alt="LeftOpen in English, showing project shortcuts, fixed addresses and listening ports"></picture>
-          <picture lang="zh"><source srcset="assets/preview-zh-dark.png" media="(prefers-color-scheme: dark)"><img src="assets/preview-zh.png" width="375" height="460" alt="LeftOpen 中文界面，展示项目快捷栏、固定地址和监听端口"></picture>
+          <picture lang="en"><source srcset="assets/preview-dark.png" media="(prefers-color-scheme: dark)"><img src="assets/preview.png" width="375" height="460" alt="Ajar in English, showing project shortcuts, fixed addresses and listening ports"></picture>
+          <picture lang="zh"><source srcset="assets/preview-zh-dark.png" media="(prefers-color-scheme: dark)"><img src="assets/preview-zh.png" width="375" height="460" alt="Ajar 中文界面，展示项目快捷栏、固定地址和监听端口"></picture>
         </figure>
       </section>
       <section>
@@ -744,26 +744,26 @@
            <article class="essential"><h3 lang="zh">固定地址 <span class="feature-badge">新功能</span></h3><h3 lang="en">Keep one address <span class="feature-badge">New</span></h3><p lang="zh">为项目启用 <code>https://myapp.localhost</code>，端口变化后自动跟随。内置 Portless，只需在设置中授权一次。</p><p lang="en">Give a project <code>https://myapp.localhost</code> that follows it across port changes. Portless is built in; authorize once in Settings.</p></article>
           <article class="essential"><h3 lang="zh">端口属于谁</h3><h3 lang="en">Know the owner</h3><p lang="zh">从进程、工作目录和项目标记推断归属，避免只看到一个模糊的 <code>node</code>。</p><p lang="en">It uses the process, working directory and project markers, so you see more than a generic <code>node</code>.</p></article>
           <article class="essential"><h3 lang="zh">哪里可见</h3><h3 lang="en">Know the scope</h3><p lang="zh">区分只在本机监听的服务，以及可能暴露到局域网的端口。</p><p lang="en">It distinguishes local-only services from ports that may be visible on your LAN.</p></article>
-          <article class="essential"><h3 lang="zh">该关什么</h3><h3 lang="en">Close what you choose</h3><p lang="zh">可关闭的服务在前；系统服务和应用仍可查看，但不会被 LeftOpen 关闭。</p><p lang="en">Closable services come first. System services and apps remain visible, but LeftOpen will not close them.</p></article>
+          <article class="essential"><h3 lang="zh">该关什么</h3><h3 lang="en">Close what you choose</h3><p lang="zh">可关闭的服务在前；系统服务和应用仍可查看，但不会被 Ajar 关闭。</p><p lang="en">Closable services come first. System services and apps remain visible, but Ajar will not close them.</p></article>
         </div>
       </section>
       <section class="safety">
         <h2 lang="zh">关闭前，先再确认一次。</h2><h2 lang="en">One last check before closing.</h2>
-        <p lang="zh"><strong>先轻轻关闭。</strong>LeftOpen 优先发送 SIGTERM。单独关闭后仍在监听，该进程会显示失败提示；警告会说明两分钟内再次关闭将强制结束。执行前重新核验进程身份，保留安全保护，不收集遥测。</p>
-        <p lang="en"><strong>Gentle close first.</strong> LeftOpen sends SIGTERM first. If a single-process close leaves it listening, that process is marked and the warning explains that closing it again within two minutes will force close it. Identity checks and safety protections still apply. No telemetry.</p>
+        <p lang="zh"><strong>先轻轻关闭。</strong>Ajar 优先发送 SIGTERM。单独关闭后仍在监听，该进程会显示失败提示；警告会说明两分钟内再次关闭将强制结束。执行前重新核验进程身份，保留安全保护，不收集遥测。</p>
+        <p lang="en"><strong>Gentle close first.</strong> Ajar sends SIGTERM first. If a single-process close leaves it listening, that process is marked and the warning explains that closing it again within two minutes will force close it. Identity checks and safety protections still apply. No telemetry.</p>
       </section>
       <section id="cli" class="cli">
         <div>
           <h2 lang="zh">终端也一样简单。</h2><h2 lang="en">The same clarity in your terminal.</h2>
           <p lang="zh">App 随附同一套扫描与关闭规则的 CLI。</p><p lang="en">The app includes a CLI with the same scan and closing rules.</p>
           <div class="commands">
-            <div class="command"><code>leftopen</code><span lang="zh">列出监听端口</span><span lang="en">List listening ports</span></div>
-            <div class="command"><code>leftopen 3000</code><span lang="zh">解释一个端口</span><span lang="en">Explain one port</span></div>
-            <div class="command"><code>leftopen url myapp</code><span lang="zh">查看固定项目地址</span><span lang="en">Print a fixed project address</span></div>
-            <div class="command"><code>leftopen close 3000</code><span lang="zh">确认后请求退出</span><span lang="en">Request an exit after confirmation</span></div>
+            <div class="command"><code>ajar</code><span lang="zh">列出监听端口</span><span lang="en">List listening ports</span></div>
+            <div class="command"><code>ajar 3000</code><span lang="zh">解释一个端口</span><span lang="en">Explain one port</span></div>
+            <div class="command"><code>ajar url myapp</code><span lang="zh">查看固定项目地址</span><span lang="en">Print a fixed project address</span></div>
+            <div class="command"><code>ajar close 3000</code><span lang="zh">确认后请求退出</span><span lang="en">Request an exit after confirmation</span></div>
           </div>
         </div>
-        <div class="term" aria-label="Example LeftOpen command output"><pre><span class="dim">$</span> leftopen
+        <div class="term" aria-label="Example Ajar command output"><pre><span class="dim">$</span> ajar
 
 <strong>MY PROJECTS</strong>
 <span class="dim">PORT    OWNER          PROCESS    SCOPE</span>
@@ -780,20 +780,20 @@
           <article class="faq-item">
             <h3 lang="zh">遇到端口被占用（Address already in use）怎么办？</h3>
             <h3 lang="en">Fix "Port already in use" (EADDRINUSE)</h3>
-            <p lang="zh">打开 LeftOpen 菜单栏或在终端运行 <code>leftopen 3000</code>，立刻看清是哪个开发服务或项目占用了端口，一键轻柔结束，无需重启电脑。</p>
-            <p lang="en">Open LeftOpen in your menu bar or run <code>leftopen 3000</code> in your terminal. See which dev server or project owns the port and close it gently—no reboot or guess-killing needed.</p>
+            <p lang="zh">打开 Ajar 菜单栏或在终端运行 <code>ajar 3000</code>，立刻看清是哪个开发服务或项目占用了端口，一键轻柔结束，无需重启电脑。</p>
+            <p lang="en">Open Ajar in your menu bar or run <code>ajar 3000</code> in your terminal. See which dev server or project owns the port and close it gently—no reboot or guess-killing needed.</p>
           </article>
           <article class="faq-item">
             <h3 lang="zh">为什么不用 lsof -i 或 kill -9？</h3>
             <h3 lang="en">Why not just lsof -i or kill -9?</h3>
-            <p lang="zh"><code>lsof</code> 往往只显示含糊的 <code>node</code> 和 PID，容易误杀其他项目；而 <code>kill -9</code> 强制终止无法执行清理钩子。LeftOpen 会向上追溯项目目录与图标，并在发 SIGTERM 前核验进程与关联端口。</p>
-            <p lang="en"><code>lsof</code> only prints raw PIDs and generic process names like <code>node</code>, risking collateral damage. <code>kill -9</code> corrupts caches. LeftOpen resolves the project directory and icons, and validates start times before sending SIGTERM.</p>
+            <p lang="zh"><code>lsof</code> 往往只显示含糊的 <code>node</code> 和 PID，容易误杀其他项目；而 <code>kill -9</code> 强制终止无法执行清理钩子。Ajar 会向上追溯项目目录与图标，并在发 SIGTERM 前核验进程与关联端口。</p>
+            <p lang="en"><code>lsof</code> only prints raw PIDs and generic process names like <code>node</code>, risking collateral damage. <code>kill -9</code> corrupts caches. Ajar resolves the project directory and icons, and validates start times before sending SIGTERM.</p>
           </article>
           <article class="faq-item">
             <h3 lang="zh">局域网可见（LAN）有什么安全风险？</h3>
             <h3 lang="en">What does LAN-visible mean?</h3>
-            <p lang="zh">绑定在 <code>0.0.0.0</code> 或无线网卡 IP 的端口，同 Wi-Fi 下的其他设备可以直接访问。LeftOpen 将其醒目标记为 LAN，防止调试接口或数据库在公共网络意外暴露。</p>
-            <p lang="en">Services listening on <code>0.0.0.0</code> or your Wi-Fi IP can be reached by other devices on your network. LeftOpen flags these as LAN so dev endpoints or databases aren't accidentally exposed.</p>
+            <p lang="zh">绑定在 <code>0.0.0.0</code> 或无线网卡 IP 的端口，同 Wi-Fi 下的其他设备可以直接访问。Ajar 将其醒目标记为 LAN，防止调试接口或数据库在公共网络意外暴露。</p>
+            <p lang="en">Services listening on <code>0.0.0.0</code> or your Wi-Fi IP can be reached by other devices on your network. Ajar flags these as LAN so dev endpoints or databases aren't accidentally exposed.</p>
           </article>
           <article class="faq-item">
             <h3 lang="zh">支持哪些框架与项目推断？</h3>
@@ -804,18 +804,18 @@
         </div>
       </section>
     </main>
-    <footer><span lang="zh">把虚掩着的门轻轻关上。</span><span lang="en">Gently close the doors left ajar.</span><nav><a href="#faq">FAQ</a><a href="https://github.com/SonghaiFan/leftopen">GitHub</a><a href="https://github.com/SonghaiFan/leftopen/releases/latest">Releases</a><a href="https://github.com/SonghaiFan/leftopen/blob/main/LICENSE">MIT</a></nav></footer>
+    <footer><span lang="zh">把虚掩着的门轻轻关上。</span><span lang="en">Gently close the doors left ajar.</span><nav><a href="#faq">FAQ</a><a href="https://github.com/boyongjiong/ajar">GitHub</a><a href="https://github.com/boyongjiong/ajar/releases/latest">Releases</a><a href="https://github.com/boyongjiong/ajar/blob/main/LICENSE">MIT</a><a href="https://github.com/SonghaiFan/leftopen">Forked from LeftOpen</a></nav></footer>
   </div>
   <script>
     document.getElementById('lang').addEventListener('click', function () {
       var next = document.documentElement.getAttribute('data-lang') === 'zh' ? 'en' : 'zh';
       document.documentElement.setAttribute('data-lang', next);
       document.documentElement.setAttribute('lang', next === 'zh' ? 'zh-CN' : 'en');
-      try { localStorage.setItem('leftopen-lang', next); } catch (e) {}
+      try { localStorage.setItem('ajar-lang', next); } catch (e) {}
     });
     document.getElementById('copy').addEventListener('click', function () {
       var button = this;
-      navigator.clipboard.writeText('brew install --cask songhaifan/tap/leftopen').then(function () {
+      navigator.clipboard.writeText('git clone https://github.com/boyongjiong/ajar.git').then(function () {
         var original = button.innerHTML;
         button.textContent = document.documentElement.getAttribute('data-lang') === 'zh' ? '已复制' : 'Copied';
         setTimeout(function () { button.innerHTML = original; }, 1800);

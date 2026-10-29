@@ -5,17 +5,17 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>LeftOpen</string>
+	<string>Ajar</string>
 	<key>CFBundleExecutable</key>
-	<string>LeftOpenApp</string>
+	<string>AjarApp</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>app.leftopen.mac</string>
+	<string>io.github.boyongjiong.ajar.mac</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>LeftOpen</string>
+	<string>Ajar</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -34,6 +34,6 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>LeftOpen checks listening ports on this Mac to identify web services you can open.</string>
+	<string>Ajar checks listening ports on this Mac to identify web services you can open.</string>
 </dict>
 </plist>

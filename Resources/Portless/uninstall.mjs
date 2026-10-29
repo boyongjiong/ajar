@@ -25,7 +25,7 @@ try {
       !home || !path.isAbsolute(home) || path.normalize(home) !== home || home === '/') throw new Error('invalidOwner');
   if (Number(checked('/usr/bin/id', ['-u', user], 'invalidOwner').trim()) !== uid ||
       checked('/usr/bin/dscl', ['.', '-read', `/Users/${user}`, 'NFSHomeDirectory'], 'invalidOwner').trim() !== `NFSHomeDirectory: ${home}`) throw new Error('invalidOwner');
-  const support = `${home}/Library/Application Support/LeftOpen`;
+  const support = `${home}/Library/Application Support/Ajar`;
   const certificate = `${support}/Portless/ca.pem`;
   for (const target of [support, runtime, plist]) checkAncestors(target);
   const protectedParent = path.dirname(runtime);
@@ -52,7 +52,7 @@ try {
   }
   const hosts = '/private/etc/hosts', original = fs.readFileSync(hosts, 'utf8'), updated = removingHosts(original);
   if (updated !== original) {
-    const info = fs.statSync(hosts), temporary = `/private/etc/.leftopen-uninstall-${crypto.randomUUID()}`;
+    const info = fs.statSync(hosts), temporary = `/private/etc/.ajar-uninstall-${crypto.randomUUID()}`;
     try {
       fs.writeFileSync(temporary, updated, {flag: 'wx', mode: info.mode & 0o777});
       fs.chownSync(temporary, info.uid, info.gid);

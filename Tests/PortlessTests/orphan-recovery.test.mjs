@@ -9,8 +9,8 @@ function fixture(entry, mode = 'orphan', port, oldPort = '443', foreignPort = '0
   if (automatic) args.push('auto');
   const result = spawnSync(process.execPath, ['--import', './Tests/PortlessTests/fixtures/orphan-installation.mjs',
     `Resources/Portless/${entry}.mjs`, ...args], {encoding: 'utf8', timeout: 10000,
-    env: {...process.env, LEFTOPEN_FIXTURE_MODE: mode, LEFTOPEN_FIXTURE_PORT: oldPort,
-      LEFTOPEN_FIXTURE_FOREIGN_PORT: foreignPort}});
+    env: {...process.env, AJAR_FIXTURE_MODE: mode, AJAR_FIXTURE_PORT: oldPort,
+      AJAR_FIXTURE_FOREIGN_PORT: foreignPort}});
   const record = JSON.parse(result.stdout.split('\n').find(line => line.startsWith('FIXTURE:')).slice(8));
   return {...result, ...record};
 }
@@ -86,7 +86,7 @@ test('real uninstall entry removes orphaned service while leaving every keychain
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /removed:certificateUnresolved/);
   assert.ok(result.trace.some(([command, args]) => command === '/bin/launchctl' && args[0] === 'bootout'));
-  assert.ok(result.deleted.includes('/Library/LaunchDaemons/app.leftopen.portless.proxy.plist'));
+  assert.ok(result.deleted.includes('/Library/LaunchDaemons/io.github.boyongjiong.ajar.portless.proxy.plist'));
   assert.equal(result.trace.some(([command]) => command === '/usr/bin/security'), false);
 });
 
@@ -112,8 +112,8 @@ for (const entry of ['setup', 'uninstall']) {
       const result = fixture(entry, mode);
       assert.equal(result.status, 1);
       assert.match(result.stderr, new RegExp(code));
-      assert.match(result.stderr, /LEFTOPEN_DIAGNOSTIC:.*launchd.bootout/);
-      assert.match(result.stderr, /LEFTOPEN_DIAGNOSTIC:.*launchd.verifyStopped/);
+      assert.match(result.stderr, /AJAR_DIAGNOSTIC:.*launchd.bootout/);
+      assert.match(result.stderr, /AJAR_DIAGNOSTIC:.*launchd.verifyStopped/);
       assert.deepEqual(result.deleted, []);
       assert.equal(result.trace.filter(([, args]) => args[0] === 'bootout').length, 1);
     });
@@ -138,7 +138,7 @@ for (const entry of ['setup', 'uninstall']) {
   });
 }
 
-test('setup refuses a different HTTPS listener even when LeftOpen launchd metadata exists', () => {
+test('setup refuses a different HTTPS listener even when Ajar launchd metadata exists', () => {
   const result = fixture('setup', 'foreign-listener');
   assert.equal(result.status, 1);
   assert.match(result.stderr, /portBusy/);
