@@ -732,6 +732,7 @@ struct MenuPanel: View {
                         icon: group.primary,
                         title: group.primary.inference.label,
                         subtitle: group.subtitle,
+                        trailing: group.pids.count == 1 ? group.primary.process.compactUptime : nil,
                         isLAN: group.scope == .lan,
                         closeFailed: model.awaitsForceClose(group.primary),
                         allowsSwipe: false,
@@ -1380,6 +1381,12 @@ private struct PortRow: View {
 
     private var isLifted: Bool { swipe.offset != 0 }
 
+    private var lanColor: Color { Color(nsColor: .systemOrange) }
+    private static var lanHelp: String {
+        L("Bound beyond loopback. Localhost may still work, but access from another device is not verified.",
+          "绑定在回环地址之外。本机访问通常没问题，但其他设备能否访问未经验证。")
+    }
+
     @ViewBuilder
     var body: some View {
         if !allowsSwipe, let onSelect {
@@ -1448,6 +1455,14 @@ private struct PortRow: View {
                     if let port {
                         Text(String(port))
                             .font(AppAppearance.portNumber)
+                            .foregroundStyle(isLAN ? lanColor : Color.primary)
+                        if isLAN {
+                            Image(systemName: "globe")
+                                .font(.system(size: 9, weight: .semibold))
+                                .foregroundStyle(lanColor)
+                                .help(Self.lanHelp)
+                                .accessibilityLabel(L("LAN-facing", "局域网可见"))
+                        }
                         if fixedName != nil {
                             Image(systemName: "link")
                                 .font(.system(size: 10, weight: .semibold))
@@ -1501,15 +1516,13 @@ private struct PortRow: View {
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
             }
-            if isLAN {
-                LANBadge()
-            }
-            if let disclosure {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.tertiary)
-                    .rotationEffect(.degrees(disclosure ? 90 : 0))
-            }
+            // Every row keeps the chevron's lane so uptimes line up with folding rows.
+            Image(systemName: "chevron.right")
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(.tertiary)
+                .rotationEffect(.degrees(disclosure == true ? 90 : 0))
+                .opacity(disclosure == nil ? 0 : 1)
+                .accessibilityHidden(disclosure == nil)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
@@ -1723,18 +1736,6 @@ private final class SwipeTracker: ObservableObject {
             isArmed = false
         }
         if commit { onCommit(edge) }
-    }
-}
-
-private struct LANBadge: View {
-    var body: some View {
-        Text("LAN")
-            .font(.system(size: 9.5, weight: .bold))
-            .foregroundStyle(Color(nsColor: .systemOrange))
-            .padding(.horizontal, 5)
-            .padding(.vertical, 2)
-            .background(Color(nsColor: .systemOrange).opacity(0.15), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
-            .help(L("Bound beyond loopback. Localhost may still work, but access from another device is not verified.", "绑定在回环地址之外。本机访问通常没问题，但其他设备能否访问未经验证。"))
     }
 }
 
