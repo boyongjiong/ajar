@@ -23,6 +23,21 @@ func scopeLabel(_ scope: ListenerScope) -> String {
     scope == .local ? green("LOCAL") : yellow("LAN")
 }
 
+/// The version of the Ajar.app this CLI ships in, also when run through a symlink such as
+/// /opt/homebrew/bin/ajar. Release CI stamps the app and the literal below alike, but local
+/// builds stamp only the app, so the app's Info.plist is the one to trust when there is one.
+func appBundleVersion() -> String? {
+    var size: UInt32 = 0
+    _ = _NSGetExecutablePath(nil, &size)
+    var buffer = [CChar](repeating: 0, count: Int(size))
+    guard _NSGetExecutablePath(&buffer, &size) == 0 else { return nil }
+    let macOS = URL(fileURLWithPath: String(cString: buffer)).resolvingSymlinksInPath().deletingLastPathComponent()
+    guard macOS.lastPathComponent == "MacOS",
+          let info = NSDictionary(contentsOf: macOS.deletingLastPathComponent().appendingPathComponent("Info.plist")),
+          let version = info["CFBundleShortVersionString"] as? String, !version.isEmpty else { return nil }
+    return version
+}
+
 /// The CLI is synchronous; role probes are bounded, so waiting on them here is brief.
 func portRoles(_ activities: [Activity]) -> [String: PortRole] {
     final class Box: @unchecked Sendable { var roles: [String: PortRole] = [:] }
@@ -344,7 +359,11 @@ if args.contains("-h") || args.contains("--help") {
 }
 
 if args.contains("-v") || args.contains("--version") {
-    print("Ajar 0.4.2")
+    if let version = appBundleVersion() {
+        print("Ajar \(version)")
+    } else {
+        print("Ajar 0.4.2")
+    }
     exit(0)
 }
 
