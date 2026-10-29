@@ -454,7 +454,7 @@ struct MenuPanel: View {
                         savedProjects
                         ForEach(sections, id: \.category) { section in
                             let expanded = isExpanded(section.category, section.groups)
-                            categoryHeader(section.category, count: section.groups.count, expanded: expanded) {
+                            categoryHeader(section.category, groups: section.groups, expanded: expanded) {
                                 if section.category == .devServer && model.visible.closableProjectActivities.count >= 2 {
                                     Button(L("Close All…", "全部关闭…")) {
                                         Task { await model.previewBatchCloseProjects() }
@@ -648,18 +648,29 @@ struct MenuPanel: View {
         .padding(.bottom, 4)
     }
 
+    /// Rows fold a process's ports together while the menu bar badge counts ports, so when the two
+    /// differ the header names both instead of a bare row count that disagrees with the badge.
+    private func sectionCount(_ groups: [ListenerGroup]) -> String {
+        let ports = Set(groups.flatMap(\.ports)).count
+        guard ports != groups.count else { return String(ports) }
+        let processes = Set(groups.flatMap(\.pids)).count
+        return L("\(processes) process\(processes == 1 ? "" : "es") · \(ports) ports",
+                 "\(processes) 个进程 · \(ports) 个端口")
+    }
+
     /// A foldable section title. Hovering it explains where these ports come from and how to
     /// close them; folding is disabled while searching so matches are never hidden.
-    private func categoryHeader<Accessory: View>(_ category: PortCategory, count: Int, expanded: Bool,
+    private func categoryHeader<Accessory: View>(_ category: PortCategory, groups: [ListenerGroup], expanded: Bool,
                                                  @ViewBuilder accessory: () -> Accessory) -> some View {
         let foldable = query.isEmpty && !expandAllSections
+        let count = sectionCount(groups)
         return HStack(spacing: 0) {
             Button {
                 guard foldable else { return }
                 withAnimation(motion) { sectionExpansion[category] = !expanded }
             } label: {
                 sectionHeader(category.title) {
-                    Text(String(count))
+                    Text(count)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.tertiary)
                     if foldable {

@@ -413,6 +413,29 @@ final class LeftOpenCoreTests: XCTestCase {
         XCTAssertNil(CloseService.protectionReason(for: activity))
     }
 
+    func testDevelopmentToolsAreNamedInsteadOfTheirStartingProject() {
+        let project = ProjectMarker(name: "mrp", root: "/private/tmp/mrp",
+            source: ".git", markerPath: "/private/tmp/mrp/.git")
+        func tool(_ command: String, _ arguments: String) -> OwnerInference? {
+            let process = ProcessFact(pid: 42, ppid: 500, command: command, executablePath: nil,
+                uid: Int32(getuid()), user: nil, cwd: project.root, arguments: arguments)
+            return Scanner.inferDevelopmentTool(process: process, project: project)
+        }
+        let java = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home/bin/java"
+        XCTAssertEqual(tool("java", "\(java) --add-opens=java.base/java.util=ALL-UNNAMED -cp gradle-launcher-8.3.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.3")?.label, "Gradle Daemon")
+        XCTAssertEqual(tool("java", "\(java) -cp kotlin-daemon.jar org.jetbrains.kotlin.daemon.KotlinCompileDaemon --daemon-runFilesPath x")?.label, "Kotlin Daemon")
+        XCTAssertEqual(tool("java", "\(java) -cp mvnd-daemon.jar org.mvndaemon.mvnd.daemon.DaemonMain")?.label, "Maven Daemon")
+        let sshuttle = tool("Python", "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python /opt/homebrew/bin/sshuttle -v --dns -r kuttle 10.200.0.0/20")
+        XCTAssertEqual(sshuttle?.label, "sshuttle")
+        XCTAssertEqual(sshuttle?.category, .service)
+        XCTAssertTrue(sshuttle?.reason.contains(project.root) == true, "The starting project stays as context")
+
+        // The application a build launches is still the project, even when its classpath names Gradle.
+        XCTAssertNil(tool("java", "\(java) -cp /private/tmp/mrp/build/classes:/Users/me/.gradle/caches/gradle-api.jar ai.example.PortalWebApplication"))
+        // Mentioning a tool later in the arguments is not running it.
+        XCTAssertNil(tool("node", "/usr/local/bin/node server.js --proxy sshuttle"))
+    }
+
     func testProjectRuntimeInsideAppDoesNotBecomeAppOwned() {
         let project = ProjectMarker(name: "site", root: "/private/tmp/site",
             source: ".git", markerPath: "/private/tmp/site/.git")

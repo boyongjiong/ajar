@@ -490,6 +490,9 @@ public enum Scanner {
     }
 
     private static func inferOwner(process: ProcessFact, project: ProjectMarker?, bundle: ApplicationBundle?) -> OwnerInference {
+        if let tool = inferDevelopmentTool(process: process, project: project) {
+            return tool
+        }
         if let project {
             return OwnerInference(label: project.name, category: .project, confidence: "high",
                 reason: L("CWD is within a project root containing \(project.source) at \(project.markerPath).",
@@ -521,6 +524,34 @@ public enum Scanner {
         return OwnerInference(label: L("Unknown", "未知"), category: .unknown, confidence: "none",
             reason: L("No accepted project marker, application bundle, or system executable path established an owner.",
                       "没有找到可确认归属的项目标记、App 或系统程序路径。"))
+    }
+
+    /// Build daemons and tunnels inherit the project folder they were started from, but they do
+    /// not serve that project. Matched on the arguments that name the tool itself, so the row says
+    /// what it is and "Close All" leaves it alone; the project stays as context in the reason.
+    static func inferDevelopmentTool(process: ProcessFact, project: ProjectMarker?) -> OwnerInference? {
+        guard let args = process.arguments else { return nil }
+        let pieces = args.split(whereSeparator: \.isWhitespace).map(String.init)
+        // The executable and, for interpreters, the script it runs.
+        let launched = pieces.prefix(2).map { ($0 as NSString).lastPathComponent }
+        let tools: [(label: String, matches: Bool, en: String, zh: String)] = [
+            ("Gradle Daemon", pieces.contains("org.gradle.launcher.daemon.bootstrap.GradleDaemon"),
+             "Gradle build daemon; the port talks to the gradlew client. Builds and tasks it runs, such as bootRun, stop with it.",
+             "Gradle 构建守护进程，端口用于与 gradlew 客户端通信。它运行的构建和任务（如 bootRun）会随它一起停止。"),
+            ("Kotlin Daemon", pieces.contains("org.jetbrains.kotlin.daemon.KotlinCompileDaemon"),
+             "Kotlin compile daemon used by builds; the next build starts it again.",
+             "构建使用的 Kotlin 编译守护进程，下次构建时会重新启动。"),
+            ("Maven Daemon", pieces.contains("org.mvndaemon.mvnd.daemon.DaemonMain"),
+             "Maven Daemon (mvnd) build process; the next build starts it again.",
+             "Maven Daemon（mvnd）构建进程，下次构建时会重新启动。"),
+            ("sshuttle", launched.contains("sshuttle"),
+             "sshuttle tunnel over SSH; the port is its local transparent proxy. Closing it cuts traffic routed through the tunnel.",
+             "基于 SSH 的 sshuttle 隧道，端口是它的本地透明代理。关闭后经隧道转发的网络会中断。"),
+        ]
+        guard let tool = tools.first(where: \.matches) else { return nil }
+        let started = project.map { L(" Started in \($0.name) (\($0.root)).", "在 \($0.name)（\($0.root)）中启动。") } ?? ""
+        return OwnerInference(label: tool.label, category: .service, confidence: "high",
+            reason: L(tool.en + started, tool.zh + started))
     }
 
     private static func inferInterpreterOwner(process: ProcessFact) -> OwnerInference? {
