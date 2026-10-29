@@ -1456,6 +1456,8 @@ private struct PortRow: View {
                         Text(String(port))
                             .font(AppAppearance.portNumber)
                             .foregroundStyle(isLAN ? lanColor : Color.primary)
+                            .lineLimit(1)
+                            .fixedSize()
                         if isLAN {
                             Image(systemName: "globe")
                                 .font(.system(size: 9, weight: .semibold))
@@ -1482,7 +1484,8 @@ private struct PortRow: View {
                             .transition(.offset(y: 10).combined(with: .opacity))
                     }
                 }
-                .frame(width: 76, alignment: .leading)
+                // Fits a five-digit port with the LAN, fixed-address and +N badges on one line.
+                .frame(width: 92, alignment: .leading)
             }
 
             if let icon {
