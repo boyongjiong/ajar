@@ -318,14 +318,22 @@ struct SettingsView: View {
         .accessibilityLabel(star)
     }
 
-    /// Ajar is a fork; credit the original project where its author's signature used to be.
+    /// Ajar is a fork; credit the original project where its author's signature used to be, next
+    /// to the MIT notice the app ships (absent from bare development binaries).
     private var credit: some View {
-        Link(L("Forked from LeftOpen", "fork 自 LeftOpen"),
-             destination: URL(string: "https://github.com/SonghaiFan/leftopen")!)
-            .font(AppAppearance.secondary)
-            .foregroundStyle(.tertiary)
-            .buttonStyle(.plain)
-            .help(L("Ajar is a fork of LeftOpen by Songhai Fan (MIT).", "Ajar fork 自 Songhai Fan 的 LeftOpen（MIT 许可）。"))
+        HStack(spacing: 4) {
+            Link(L("Forked from LeftOpen", "fork 自 LeftOpen"),
+                 destination: URL(string: "https://github.com/SonghaiFan/leftopen")!)
+                .help(L("Ajar is a fork of LeftOpen by Songhai Fan (MIT).", "Ajar fork 自 Songhai Fan 的 LeftOpen（MIT 许可）。"))
+            if let license = Bundle.main.url(forResource: "LICENSE", withExtension: "txt") {
+                Text("·")
+                Button(L("MIT License", "MIT 许可")) { NSWorkspace.shared.open(license) }
+                    .help(L("Open the license and copyright notice", "查看许可与版权声明"))
+            }
+        }
+        .font(AppAppearance.secondary)
+        .foregroundStyle(.tertiary)
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder

@@ -1,5 +1,5 @@
 Portless 0.15.7, copyright Vercel Inc., licensed under Apache-2.0.
-Ajar modifies the bundled CLI and hosts module:
+LeftOpen, and Ajar (its fork), modify the bundled CLI and hosts module:
 - separate launchd label and hosts-file markers, leaving external Portless alone;
 - expose a read-only project-info command using upstream inference and config;
 - expire native-observed routes and recheck owner liveness on every request.

@@ -40,7 +40,11 @@ def extract_member(archive, member, destination):
 
 
 def prepare():
-    OUTPUT.mkdir(parents=True, exist_ok=True)
+    # Start empty so files renamed or removed in Resources/Portless never ship from an old run;
+    # downloads stay cached in CACHE.
+    if OUTPUT.exists():
+        shutil.rmtree(OUTPUT)
+    OUTPUT.mkdir(parents=True)
     version = LOCK['nodeVersion']
     for arch, checksum in LOCK['nodeSHA256'].items():
         name = f'node-v{version}-darwin-{arch}'
@@ -77,7 +81,7 @@ def prepare():
         if cli.count(before) != 1:
             raise ValueError('Pinned Portless CLI layout changed; review the adapter')
         cli = cli.replace(before, after)
-    cli = cli.replace('#!/usr/bin/env node\n', '#!/usr/bin/env node\n// Modified by Ajar; see ../../AJAR-NOTICE.\nimport { gateRoutes } from "../../lease-gate.mjs";\n', 1)
+    cli = cli.replace('#!/usr/bin/env node\n', '#!/usr/bin/env node\n// Modified by LeftOpen and its fork Ajar; see ../../AJAR-NOTICE.\nimport { gateRoutes } from "../../lease-gate.mjs";\n', 1)
     needle = '  const args = process.argv.slice(2);'
     if cli.count(needle) != 1:
         raise ValueError('Pinned CLI argument entry changed')
@@ -103,7 +107,7 @@ def prepare():
     for module in (package_dir / 'dist').glob('*.js'):
         value = module.read_text()
         if '"# portless-start"' in value:
-            value = '// Hosts markers modified by Ajar; see ../../AJAR-NOTICE.\n' + value.replace('"# portless-start"', '"# ajar-portless-start"').replace('"# portless-end"', '"# ajar-portless-end"')
+            value = '// Hosts markers modified by LeftOpen and its fork Ajar; see ../../AJAR-NOTICE.\n' + value.replace('"# portless-start"', '"# ajar-portless-start"').replace('"# portless-end"', '"# ajar-portless-end"')
             module.write_text(value)
             modified_hosts += 1
     if modified_hosts != 1:

@@ -47,6 +47,8 @@ else
   print -u2 "Missing generated resource bundle: ${resource_bundle}"
   exit 1
 fi
+# MIT asks for the copyright and permission notice in every copy, including the built app.
+cp "${project_dir}/LICENSE" "${app_path}/Contents/Resources/LICENSE.txt"
 mkdir -p "${app_path}/Contents/Resources/Portless"
 cp -R "${project_dir}/.build/portless-runtime/." "${app_path}/Contents/Resources/Portless/"
 zsh "${project_dir}/Scripts/sign-portless-runtime.sh" "${app_path}/Contents/Resources/Portless"
