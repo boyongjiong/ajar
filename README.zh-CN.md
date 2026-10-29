@@ -60,7 +60,7 @@ ln -sf /Applications/Ajar.app/Contents/MacOS/ajar /opt/homebrew/bin/ajar   # 可
 - **默认安静。** 原生 SwiftUI `MenuBarExtra`。无 Dock 图标，无遥测；除非启用固定地址，否则没有后台服务。唯一离开这台 Mac 的网络请求是每天向 GitHub 查询一次最新版本，可在设置中关闭。
 - **固定项目地址。** 为开发服务器分配稳定的 `https://myapp.localhost`，端口变化后自动跟随，由内置的 [Portless](https://github.com/vercel-labs/portless) 提供。详见[下文](#固定项目地址)。
 - **说清每个端口的用途。** 一个进程有多个端口时，分别标出 Spring Actuator、应用服务器、网页（取页面标题）、JSON API，或不说 HTTP 的 TCP 端口；只对本机地址发两个有限制的请求。
-- **认出构建守护进程和隧道。** Gradle、Kotlin、Maven 守护进程和 sshuttle 显示为工具本身，而不是启动它们的项目目录；“全部关闭”不会动它们。
+- **认出构建守护进程、测试服务和隧道。** Gradle、Kotlin、Maven 守护进程、Playwright 测试服务和 sshuttle 显示为工具本身，而不是启动它们的项目目录；“全部关闭”不会动它们。
 - **终端里是同一个引擎。** App 附带 `ajar` 命令行工具，推断和安全规则完全一致。
 
 ---

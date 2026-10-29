@@ -60,7 +60,7 @@ Local builds are ad-hoc signed, which is fine on your own Mac. If downloads fail
 - **Quiet by default.** Native SwiftUI `MenuBarExtra`. No Dock icon, no telemetry, and no background service unless you opt into fixed addresses. The only request that leaves this Mac is a daily check of the latest GitHub release, which you can turn off in Settings.
 - **Fixed project addresses.** Give a dev server a stable `https://myapp.localhost` URL that follows it across port changes, powered by bundled [Portless](https://github.com/vercel-labs/portless). See [below](#fixed-project-addresses).
 - **Says what each port is for.** A process with several ports shows each one's role — Spring Actuator, app server, a page by its title, a JSON API, or TCP that doesn't speak HTTP — from two bounded requests on this Mac's own addresses.
-- **Names build daemons and tunnels.** Gradle, Kotlin and Maven daemons and sshuttle are shown as themselves instead of the project folder they were started from, and "Close All" leaves them alone.
+- **Names build daemons, test servers and tunnels.** Gradle, Kotlin and Maven daemons, the Playwright test server and sshuttle are shown as themselves instead of the project folder they were started from, and "Close All" leaves them alone.
 - **Same engine in the terminal.** The app ships an `ajar` CLI with identical inference and safety rules.
 
 ---

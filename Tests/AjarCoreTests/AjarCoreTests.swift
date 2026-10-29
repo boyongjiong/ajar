@@ -425,6 +425,12 @@ final class AjarCoreTests: XCTestCase {
         XCTAssertEqual(tool("java", "\(java) --add-opens=java.base/java.util=ALL-UNNAMED -cp gradle-launcher-8.3.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.3")?.label, "Gradle Daemon")
         XCTAssertEqual(tool("java", "\(java) -cp kotlin-daemon.jar org.jetbrains.kotlin.daemon.KotlinCompileDaemon --daemon-runFilesPath x")?.label, "Kotlin Daemon")
         XCTAssertEqual(tool("java", "\(java) -cp mvnd-daemon.jar org.mvndaemon.mvnd.daemon.DaemonMain")?.label, "Maven Daemon")
+        let playwright = tool("node", "node node_modules/.pnpm/@playwright+test@1.58.2/node_modules/@playwright/test/cli.js test-server -c apps/web/playwright.config.ts --host 127.0.0.1")
+        XCTAssertEqual(playwright?.label, "Playwright Test Server")
+        XCTAssertEqual(playwright?.category, .service)
+        XCTAssertEqual(tool("node", "/usr/local/bin/node /p/node_modules/playwright/cli.js test-server")?.label, "Playwright Test Server")
+        // A test run is not the test server.
+        XCTAssertNil(tool("node", "node node_modules/@playwright/test/cli.js test --project chromium"))
         let sshuttle = tool("Python", "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python /opt/homebrew/bin/sshuttle -v --dns -r kuttle 10.200.0.0/20")
         XCTAssertEqual(sshuttle?.label, "sshuttle")
         XCTAssertEqual(sshuttle?.category, .service)

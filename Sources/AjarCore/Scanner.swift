@@ -526,7 +526,7 @@ public enum Scanner {
                       "没有找到可确认归属的项目标记、App 或系统程序路径。"))
     }
 
-    /// Build daemons and tunnels inherit the project folder they were started from, but they do
+    /// Build daemons, test servers and tunnels inherit the project folder they were started from, but they do
     /// not serve that project. Matched on the arguments that name the tool itself, so the row says
     /// what it is and "Close All" leaves it alone; the project stays as context in the reason.
     static func inferDevelopmentTool(process: ProcessFact, project: ProjectMarker?) -> OwnerInference? {
@@ -544,6 +544,10 @@ public enum Scanner {
             ("Maven Daemon", pieces.contains("org.mvndaemon.mvnd.daemon.DaemonMain"),
              "Maven Daemon (mvnd) build process; the next build starts it again.",
              "Maven Daemon（mvnd）构建进程，下次构建时会重新启动。"),
+            ("Playwright Test Server", pieces.contains("test-server")
+                && (pieces.dropFirst().first.map { $0.hasSuffix("@playwright/test/cli.js") || $0.hasSuffix("/playwright/cli.js") } ?? false),
+             "Playwright test server for an editor's test panel or UI mode; the port talks to that client, not a browser. The editor starts it again when it runs tests.",
+             "Playwright 测试服务，供编辑器的测试面板或 UI 模式使用；端口与该客户端通信，不能在浏览器中打开。编辑器运行测试时会再次启动它。"),
             ("sshuttle", launched.contains("sshuttle"),
              "sshuttle tunnel over SSH; the port is its local transparent proxy. Closing it cuts traffic routed through the tunnel.",
              "基于 SSH 的 sshuttle 隧道，端口是它的本地透明代理。关闭后经隧道转发的网络会中断。"),
