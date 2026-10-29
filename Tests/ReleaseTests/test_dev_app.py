@@ -81,6 +81,24 @@ class LocalAppTests(unittest.TestCase):
         clean.assert_called_once()
         self.assertEqual(popen.call_args.args[0], [str(self.build.app / 'Contents/MacOS/LeftOpenApp')])
 
+    def test_version_describes_commits_since_latest_stable_release(self):
+        def described(output, code=0):
+            with patch.object(dev.subprocess, 'run', return_value=subprocess.CompletedProcess([], code, output, '')) as run:
+                version = dev.describe_version(self.root)
+            self.assertIn('--exclude', run.call_args.args[0])
+            return version
+        self.assertEqual(described('v0.5.8-11-g359734b\n'), '0.5.8-dev.11+359734b')
+        self.assertEqual(described('v0.5.8-0-g359734b-dirty\n'), '0.5.8-dev.0+359734b.dirty')
+        self.assertIsNone(described('', 128))
+        self.assertIsNone(described('359734b\n'))
+        with patch.object(dev.subprocess, 'run', side_effect=FileNotFoundError('git')):
+            self.assertIsNone(dev.describe_version(self.root))
+
+    def test_build_passes_described_version_to_packaging(self):
+        with patch.object(dev, 'describe_version', return_value='0.5.8-dev.1+abc1234'), patch.object(dev.subprocess, 'run') as run, patch.object(self.build, 'active', return_value=False), patch.object(self.build, 'unregister'):
+            self.build.build()
+        self.assertEqual(run.call_args.kwargs['env']['LEFTOPEN_VERSION'], '0.5.8-dev.1+abc1234')
+
     def test_unregistered_bundle_is_cleanable_but_other_errors_preserve_output(self):
         self.owned()
         with patch.object(self.build, 'active', return_value=False), patch.object(dev.subprocess, 'run', return_value=subprocess.CompletedProcess([], 1, '', 'failed: -10814')):

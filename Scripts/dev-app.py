@@ -4,6 +4,7 @@ import argparse
 import fcntl
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -11,6 +12,25 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 REGISTER = '/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister'
 MARKER = '.leftopen-local-build'
+
+
+def describe_version(repo):
+    """Latest stable release tag plus commits since, e.g. 0.5.8-dev.11+359734b.
+
+    The source keeps a placeholder version that only release CI replaces, so without this a
+    local build would report that old number and claim every release is an update.
+    """
+    try:
+        result = subprocess.run(['git', 'describe', '--tags', '--long', '--dirty',
+                                 '--match', 'v[0-9]*', '--exclude', '*-*'],
+                                cwd=repo, capture_output=True, text=True)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    match = re.fullmatch(r'v(\d+\.\d+\.\d+)-(\d+)-g([0-9a-f]+)(-dirty)?', result.stdout.strip())
+    if result.returncode or not match:
+        return None
+    version, ahead, commit, dirty = match.groups()
+    return f'{version}-dev.{ahead}+{commit}' + ('.dirty' if dirty else '')
 
 
 class LocalBuild:
@@ -51,11 +71,14 @@ class LocalBuild:
         shutil.rmtree(self.directory)
 
     def build(self):
+        version = describe_version(self.repo)
         self.clean()
         self.directory.mkdir(parents=True)
         (self.directory / MARKER).write_text('leftopen-local-build-v1\n')
         env = dict(os.environ, LEFTOPEN_OUTPUT_DIR=str(self.directory),
                    LEFTOPEN_BUNDLE_ID='app.leftopen.local-test', LEFTOPEN_APP_DISPLAY_NAME='LeftOpen Test')
+        if version:
+            env['LEFTOPEN_VERSION'] = version
         try:
             subprocess.run(['/bin/zsh', str(self.repo / 'Scripts/build-app.sh')], cwd=self.repo, env=env, check=True)
             self.unregister()

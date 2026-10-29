@@ -55,6 +55,10 @@ if [[ -n "${LEFTOPEN_APP_DISPLAY_NAME:-}" ]]; then
   plutil -replace CFBundleDisplayName -string "$LEFTOPEN_APP_DISPLAY_NAME" "${app_path}/Contents/Info.plist"
   plutil -replace CFBundleName -string "$LEFTOPEN_APP_DISPLAY_NAME" "${app_path}/Contents/Info.plist"
 fi
+# Local test builds describe their commit; releases stamp the source with prepare-release.py.
+if [[ -n "${LEFTOPEN_VERSION:-}" ]]; then
+  plutil -replace CFBundleShortVersionString -string "$LEFTOPEN_VERSION" "${app_path}/Contents/Info.plist"
+fi
 swift "${project_dir}/Scripts/legacy-app-icon.swift" verify "${project_dir}/Resources/AppIcon.icns" "$app_path"
 # Sign nested code before the bundle, which signs the main executable too.
 codesign --force --sign - "${app_path}/Contents/MacOS/leftopen"

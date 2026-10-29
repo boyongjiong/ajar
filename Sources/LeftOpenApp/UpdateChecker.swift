@@ -36,8 +36,10 @@ final class UpdateChecker: ObservableObject {
         return URLSession(configuration: configuration)
     }()
 
-    /// Nil for a development build, which has no version to compare.
-    let currentVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String).flatMap(ReleaseVersion.init)
+    /// Nil for a development build, which has no version to compare, and for a local test build
+    /// (`Scripts/dev-app.py`), whose version names a commit rather than a release.
+    let currentVersion = Bundle.main.bundleIdentifier == "app.leftopen.local-test" ? nil
+        : (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String).flatMap(ReleaseVersion.init)
 
     /// The cask leaves a Caskroom entry, and brew should do the upgrade so it keeps track of it.
     var installedWithHomebrew: Bool {
