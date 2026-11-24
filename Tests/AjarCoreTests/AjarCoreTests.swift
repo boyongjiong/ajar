@@ -436,6 +436,20 @@ final class AjarCoreTests: XCTestCase {
         XCTAssertEqual(sshuttle?.category, .service)
         XCTAssertTrue(sshuttle?.reason.contains(project.root) == true, "The starting project stays as context")
 
+        // Claude Code's native binary is named after its version, so lsof reports "2.1.331" as the command.
+        let claudeProcess = ProcessFact(pid: 42, ppid: 500, command: "2.1.331",
+            executablePath: "/Users/me/.local/share/claude/versions/2.1.331",
+            uid: Int32(getuid()), user: nil, cwd: project.root, arguments: "claude")
+        let claude = Scanner.inferDevelopmentTool(process: claudeProcess, project: project)
+        XCTAssertEqual(claude?.label, "Claude Code")
+        XCTAssertEqual(claude?.category, .service)
+        XCTAssertTrue(claude?.reason.contains("2.1.331") == true, "The version stays as context")
+        XCTAssertEqual(tool("node", "node /usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js --resume")?.label, "Claude Code")
+        XCTAssertNil(tool("node", "node server.js --name claude"))
+        let agy = tool("agy", "/Users/me/.gemini/bin/agy --hub --hub-port=58399 --app_data_dir=antigravity --add-dir=/private/tmp/mrp")
+        XCTAssertEqual(agy?.label, "Antigravity")
+        XCTAssertEqual(agy?.category, .service)
+
         // The application a build launches is still the project, even when its classpath names Gradle.
         XCTAssertNil(tool("java", "\(java) -cp /private/tmp/mrp/build/classes:/Users/me/.gradle/caches/gradle-api.jar ai.example.PortalWebApplication"))
         // Mentioning a tool later in the arguments is not running it.

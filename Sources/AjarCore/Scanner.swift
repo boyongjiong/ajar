@@ -548,6 +548,16 @@ public enum Scanner {
                 && (pieces.dropFirst().first.map { $0.hasSuffix("@playwright/test/cli.js") || $0.hasSuffix("/playwright/cli.js") } ?? false),
              "Playwright test server for an editor's test panel or UI mode; the port talks to that client, not a browser. The editor starts it again when it runs tests.",
              "Playwright 测试服务，供编辑器的测试面板或 UI 模式使用；端口与该客户端通信，不能在浏览器中打开。编辑器运行测试时会再次启动它。"),
+            ("Claude Code", isClaudeCode(process: process, pieces: pieces),
+             "Claude Code session running in a terminal; the port is a local endpoint it opens for its own clients, not a web page. Closing it ends that session." + (claudeCodeVersion(process).map { " Version \($0)." } ?? ""),
+             "在终端中运行的 Claude Code 会话；端口是它为自身客户端打开的本地端点，不是网页。关闭会结束该会话。" + (claudeCodeVersion(process).map { "版本 \($0)。" } ?? "")),
+            ("Antigravity", launched.first == "agy" || process.executablePath.map { ($0 as NSString).lastPathComponent == "agy" } == true,
+             pieces.contains("--hub")
+                ? "Antigravity CLI (agy) hub for an agent session; the ports talk to its own clients, not a browser. Closing it ends that session."
+                : "Antigravity CLI (agy) agent session; the port is a local endpoint for its own clients, not a web page. Closing it ends that session.",
+             pieces.contains("--hub")
+                ? "Antigravity CLI（agy）为智能体会话启动的 hub；端口与它自己的客户端通信，不能在浏览器中打开。关闭会结束该会话。"
+                : "Antigravity CLI（agy）智能体会话；端口是它为自身客户端打开的本地端点，不是网页。关闭会结束该会话。"),
             ("sshuttle", launched.contains("sshuttle"),
              "sshuttle tunnel over SSH; the port is its local transparent proxy. Closing it cuts traffic routed through the tunnel.",
              "基于 SSH 的 sshuttle 隧道，端口是它的本地透明代理。关闭后经隧道转发的网络会中断。"),
@@ -556,6 +566,20 @@ public enum Scanner {
         let started = project.map { L(" Started in \($0.name) (\($0.root)).", "在 \($0.name)（\($0.root)）中启动。") } ?? ""
         return OwnerInference(label: tool.label, category: .service, confidence: "high",
             reason: L(tool.en + started, tool.zh + started))
+    }
+
+    /// The native installer runs `~/.local/share/claude/versions/<version>`, so `lsof` reports the version
+    /// number as the command; npm installs run `@anthropic-ai/claude-code/cli.js` under node.
+    private static func isClaudeCode(process: ProcessFact, pieces: [String]) -> Bool {
+        if claudeCodeVersion(process) != nil { return true }
+        if let first = pieces.first, (first as NSString).lastPathComponent == "claude" { return true }
+        return pieces.dropFirst().first?.hasSuffix("@anthropic-ai/claude-code/cli.js") ?? false
+    }
+
+    private static func claudeCodeVersion(_ process: ProcessFact) -> String? {
+        guard let path = process.executablePath, path.contains("/claude/versions/") else { return nil }
+        let version = (path as NSString).lastPathComponent
+        return version.first?.isNumber == true ? version : nil
     }
 
     private static func inferInterpreterOwner(process: ProcessFact) -> OwnerInference? {

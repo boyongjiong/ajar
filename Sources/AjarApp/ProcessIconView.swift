@@ -295,6 +295,14 @@ struct ProcessIconResolver {
             return .appBundle(path: bundle.path)
         }
 
+        // A tool started from a project folder is not that project: don't borrow the project's icon.
+        if activity.inference.label == "Claude Code" {
+            return .symbol(name: "sparkle", color: Color(red: 0.85, green: 0.47, blue: 0.34))
+        }
+        if activity.inference.label == "Antigravity" {
+            return .symbol(name: "arrow.up.forward.circle.fill", color: Color(red: 0.26, green: 0.52, blue: 0.96))
+        }
+
         // Tier 2: Icon the project ships itself, else a framework symbol from its manifest.
         // A symbol intentionally falls through to the live favicon probe in ProcessIconView.
         if let project = activity.projectMarker {

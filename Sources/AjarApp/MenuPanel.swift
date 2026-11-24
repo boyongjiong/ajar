@@ -1345,6 +1345,12 @@ private struct ListenerGroup: Identifiable {
         if primary.editorPreview != nil, let app = primary.applicationBundle {
             return "\(app.name) · \(pid)"
         }
+        // A tool named instead of its starting project (Claude Code, Gradle…) keeps that project as context;
+        // two sessions of the same tool differ by folder, not by command.
+        if let project = primary.projectMarker, primary.inference.category != .project,
+           project.name != primary.inference.label {
+            return "\(project.name) · \(pid)"
+        }
         return primary.inference.label == primary.process.command ? pid : "\(primary.process.command) · \(pid)"
     }
 }
